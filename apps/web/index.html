@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#182b26" />
+  <meta name="description" content="Đà Lạt Hẹn Nhau — Một góc Đà Lạt dành cho những cuộc hẹn chưa thành." />
+  <title>Đà Lạt Hẹn Nhau — Nơi mình cùng dạo</title>
+</head>
+<body>
+  <main id="app">
+    <section id="lobby" class="lobby">
+      <div class="lobby-shell">
+        <header class="brandline" aria-label="Đà Lạt Hẹn Nhau">
+          <span class="brand-mark" aria-hidden="true"><svg width="28" height="30" viewBox="0 0 28 30" fill="none"><path d="M14 2 3 19h7l-6 7h20l-6-7h7L14 2Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 18v11" stroke="currentColor" stroke-width="1.6"/></svg></span>
+          <span class="brand-name">ĐÀ LẠT <b>HẸN NHAU</b></span>
+        </header>
+        <div class="lobby-grid">
+          <div class="lobby-intro">
+            <p class="eyebrow"><span class="live-dot" aria-hidden="true"></span> Một cuộc hẹn trong thế giới 3D</p>
+            <h1>Đà Lạt vẫn ở đó.<br/><em>Mình hẹn nhau nhé?</em></h1>
+            <p class="lead">Một con đường ven hồ, những hàng thông, và người bạn muốn gặp. Không nhiệm vụ. Không cần vội. Chỉ cần cùng nhau.</p>
+            <div class="scenic-graphic" aria-hidden="true">
+              <div class="scenic-sun"></div><div class="scenic-hill hill-back"></div><div class="scenic-hill hill-front"></div><div class="scenic-water"></div>
+              <span class="scenic-tree t1"></span><span class="scenic-tree t2"></span><span class="scenic-tree t3"></span>
+              <p>HỒ XUÂN HƯƠNG <span>•</span> ĐÀ LẠT</p>
+            </div>
+            <p class="editorial-note">Một thế giới Đà Lạt được kể lại bằng cảm xúc — không phải bản đồ địa lý chính xác.</p>
+          </div>
+          <section class="join-card" aria-labelledby="join-title">
+            <div class="card-topline"><span>CHÀO MỪNG BẠN ĐẾN</span><span class="small-flower" aria-hidden="true">✳</span></div>
+            <h2 id="join-title">Cùng đi dạo thôi.</h2>
+            <p id="join-desc">Chọn một tên gọi, một màu áo khoác. Bạn có thể tạo phòng mới hoặc mở link bạn bè gửi.</p>
+            <form id="join-form" autocomplete="off">
+              <label for="nickname">Bạn muốn được gọi là gì?</label>
+              <input id="nickname" name="nickname" type="text" minlength="2" maxlength="24" placeholder="Ví dụ: Mây nhỏ" required aria-describedby="name-help" />
+              <small id="name-help">2–24 ký tự, dùng tên vui vẻ là đủ.</small>
+              <label for="avatar-choice" class="avatar-title">Màu áo của bạn</label>
+              <div id="avatar-choice" class="avatar-choices" role="radiogroup" aria-label="Chọn màu áo khoác">
+                <label class="choice"><input type="radio" name="variant" value="berry" checked /><span class="swatch berry"></span><span>Đỏ mận</span></label>
+                <label class="choice"><input type="radio" name="variant" value="forest" /><span class="swatch forest"></span><span>Thông xanh</span></label>
+                <label class="choice"><input type="radio" name="variant" value="sand" /><span class="swatch sand"></span><span>Be ấm</span></label>
+                <label class="choice"><input type="radio" name="variant" value="sky" /><span class="swatch sky"></span><span>Trời xanh</span></label>
+              </div>
+              <div class="join-actions">
+                <button id="join-button" type="submit" class="btn btn-primary">Tạo chỗ hẹn <span aria-hidden="true">↗</span></button>
+                <p id="invite-note">Nếu có link mời, mở link đó để vào cùng phòng bạn.</p>
+              </div>
+              <p id="join-error" role="alert" class="error-message" hidden></p>
+            </form>
+            <footer class="card-footer"><span>✦ 2–6 người mỗi phòng</span><span>Không cần tài khoản</span></footer>
+          </section>
+        </div>
+        <footer class="lobby-bottom"><span>ĐƯỢC LÀM ĐỂ Ở CÙNG NHAU</span><span>Phiên bản thử nghiệm · Multiplayer foundation</span></footer>
+      </div>
+    </section>
+    <section id="world" class="world" hidden aria-label="Không gian Đà Lạt 3D">
+      <div id="viewport" class="viewport"></div>
+      <div class="world-topbar"><span class="world-logo">Đà Lạt <b>Hẹn Nhau</b></span><span class="world-location"><span class="live-dot"></span> ĐIỂM HẸN VEN HỒ · NETWORK SPIKE</span><button id="leave" class="world-quiet-button" type="button">Rời phòng</button></div>
+      <aside class="world-sidebar" aria-label="Thông tin phòng chơi">
+        <div class="world-widget"><p class="widget-overline">CUỘC HẸN CỦA MÌNH</p><h2>Ở đây có bạn.</h2><p id="room-status" role="status">Đang kết nối…</p><div id="player-list" class="player-list" aria-live="polite"></div></div>
+        <div class="world-widget invite-widget"><p class="widget-overline">MỜI MỌI NGƯỜI</p><p>Gửi một đường link để bạn bè đến bên hồ cùng mình.</p><button id="copy-invite" class="btn btn-invite" type="button">Sao chép link mời</button><p id="invite-status" role="status" class="copy-status"></p></div>
+      </aside>
+      <div class="world-bottom"><div class="controls-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>Đi bộ</span><span class="hint-sep">·</span><span>Kéo chuột để xoay góc nhìn</span></div><p>Đây là cảnh thử nghiệm đồng bộ vị trí; cảnh Đà Lạt hoàn chỉnh sẽ được dựng ở giai đoạn art proof.</p></div>
+      <div id="webgl-error" class="render-warning" role="alert" hidden>Trình duyệt này chưa bật được WebGL. Hãy thử Chrome/Edge trên thiết bị hỗ trợ WebGL2 để xem thế giới 3D.</div>
+    </section>
+  </main>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
