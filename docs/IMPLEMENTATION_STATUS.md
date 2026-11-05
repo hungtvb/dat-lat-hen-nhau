@@ -11,6 +11,7 @@
 | T03 client presence / avatar | Two-client roster/reconnect identity; **45s timeout cleans ghost avatar**; no reused spawn slot; host handoff skips disconnected guest | **E2E VERIFIED (SCOPED)** |
 | Lobby UI | Browser `page.set_content()` with authored HTML + CSS; screenshots saved 1440px and 390px, no horizontal overflow | **STATIC UI OBSERVED** |
 | Staging deploy (ops PR #3) | Vercel static preview READY, Railway Colyseus single instance SUCCESS. GitHub Actions [remote smoke 42048418805 attempt 2](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42048418805/attempts/2) **3/3 PASS** over public HTTPS/WSS from one CI runner; real-device WAN test still outstanding | **STAGING E2E VERIFIED (REMOTE CI)** |
+| Desktop session stability (PR pending) | Shared cleanup for terminal onLeave and voluntary leave, guard old callbacks, material disposal; real browser exit/rejoin and WebSocket terminal tests introduced — **NOT YET CI VERIFIED** | **IN REVIEW** |
 | T04 polished lakeside art proof | Placeholder only; no GPU camera/lighting/photo review | **NOT STARTED** |
 | T05+ social actions | None | **NOT STARTED** |
 

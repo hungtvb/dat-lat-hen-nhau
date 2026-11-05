@@ -83,3 +83,11 @@
 ## 6. Playtest protocol
 
 Chạy với 3–6 người, 15–20 phút. Gửi một link mời và không giao nhiệm vụ. Quan sát: họ có nhìn thấy nhau không; tự tìm được chỗ ngồi không; có dừng ngắm cảnh không; ảnh chung có dễ chụp không; có thấy muốn quay lại không. Cuối buổi hỏi 3 câu mở: “Cảnh nào em thích nhất?”, “Lúc nào thấy thực sự đi cùng nhóm?”, “Điều gì làm em mất cảm giác Đà Lạt?”. Không dùng XP/quest để ép họ đi qua khu vực.
+
+## Desktop stability regression (implementation pending verification)
+
+- **Voluntary leave:** return to lobby, remove renderer canvas, clear invite URL fragment, allow a brand-new private room in the same tab.
+- **Terminal WebSocket leave:** same cleanup and visible error; no stuck world or old session callback mutation. Do **not** treat SDK's temporary onDrop as terminal (existing reconnect test must remain green).
+- **WebGL startup failure after room join:** leave backend session and return lobby with actionable fallback, rather than continuing to send input with no renderer.
+- **Memory:** dispose per-avatar owned materials when avatars leave; avoid leaking materials across repeated sessions.
+- **Evidence:** new browser tests `tests/e2e/desktop-session.spec.ts` must run against real Colyseus/Chromium. CI must prove behavior before promotion; device-specific GPU and WAN tests remain outstanding.
