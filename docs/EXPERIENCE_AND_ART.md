@@ -105,3 +105,13 @@ Gió thông, chim xa, bước chân theo vật liệu, tiếng nước nhỏ và
 - Không dùng ảnh preview từ nguồn báo/stock làm asset game khi chưa được cấp phép. Bối cảnh được **gợi cảm hứng** bởi địa danh thật, không phải sản phẩm hướng dẫn giao thông.
 
 **Phản biện đề xuất tự động của UI UX Pro Max:** truy vấn `cozy multiplayer social game travel nature scenic exploration --design-system` trả về pattern marketing `Feature-Rich Showcase` và style `3D & Hyperrealism`. Ta **chỉ tiếp nhận tiêu chí 3D immersive & accessibility**, loại bỏ marketing hero/cards và hyperrealism nặng vì không phục vụ in-game social experience. Truy vấn stack `threejs` có kết quả về camera, color management và InstancedMesh; các khuyến nghị vẫn phải đối chiếu phiên bản Three.js thực tế lúc coding.
+
+## 11. Photographic visual-reference baseline (2026-11-05)
+
+See **[ART_REFERENCE_XUAN_HUONG.md](ART_REFERENCE_XUAN_HUONG.md)** for eight real-world photographic/source references, rights/provenance, observed-vs-artistic decisions, and three required viewpoint proofs. The machine-readable shot list is **[`world/reference-shots.json`](../world/reference-shots.json)**.
+
+**Important clarification:** The pine-framed bank, fictional `Cà phê Góc Sương`, and distant Lâm Viên plaza have **not been verified as simultaneously visible from one real camera location**. Treat the old continuous route diagram as a *design proposal*, not a geographically measured walk. Validate photo viewpoints before asserting a faithful reconstruction; use an explicitly labelled artistic composite if they cannot be reconciled.
+
+**Thứ tự triển khai:** D2-A SHOT-01 (30–40 m trong bounds hiện có) → review screenshot từ ứng dụng → D2-B SHOT-02 (60–100 m, yêu cầu cập nhật bounds phía server) → SHOT-03 chỉ khi được xác minh viewpoint. Xem [D2 Scenic Slice Implementation Detail](D2_SCENIC_SLICE_IMPLEMENTATION_DETAIL.md). 
+
+This PR updates research and implementation planning only. No new 3D assets, runtime changes, or visually inspected WebGL frames have been produced.
