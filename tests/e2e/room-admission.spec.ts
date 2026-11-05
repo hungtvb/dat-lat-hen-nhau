@@ -55,3 +55,65 @@ test('room admits six guests, rejects seventh, then frees a seat after leave',as
     await Promise.allSettled(rooms.map(room=>room.leave()));
   }
 });
+
+test('replacement guest does not reuse an occupied spawn position',async ({request}) => {
+  const {roomId,invite}=await createPrivateRoom(request);
+  const rooms:Room[]=[];
+  try {
+    const join=async (name:string) => {
+      const room=await new Client(ORIGIN).joinById(roomId,{invite,name,variant:'forest'});
+      rooms.push(room);
+      return room;
+    };
+    const a=await join('An Bình');
+    const b=await join('Bình Yên');
+    const c=await join('Cao Nguyên');
+    const getPlayers=()=> (a.state as any)?.players;
+    await expect.poll(()=>getPlayers()?.size ?? 0).toBe(3);
+    await b.leave();
+    rooms.splice(rooms.indexOf(b),1);
+    await expect.poll(()=>getPlayers()?.size ?? 0).toBe(2);
+
+    const d=await join('Đồi Thông');
+    await expect.poll(()=>getPlayers()?.size ?? 0).toBe(3);
+    const location=(id:string)=> {
+      const player=getPlayers().get(id);
+      return {x:player.x,z:player.z};
+    };
+    const replacement=location(d.sessionId);
+    expect(replacement).not.toEqual(location(a.sessionId));
+    expect(replacement).not.toEqual(location(c.sessionId));
+  } finally {
+    await Promise.allSettled(rooms.map(room=>room.leave()));
+  }
+});
+
+test('host handoff skips disconnected guest during reconnect reservation',async ({request}) => {
+  test.setTimeout(35000);
+  const {roomId,invite}=await createPrivateRoom(request);
+  const rooms:Room[]=[];
+  try {
+    const join=async (name:string) => {
+      const room=await new Client(ORIGIN).joinById(roomId,{invite,name,variant:'forest'});
+      rooms.push(room);
+      return room;
+    };
+    const a=await join('Host An');
+    const b=await join('Khách B');
+    const c=await join('Khách C');
+    const state=()=>c.state as any;
+    await expect.poll(()=>state()?.players?.size ?? 0).toBe(3);
+    await expect.poll(()=>state().hostPlayerId).toBe(a.sessionId);
+
+    // Close before the SDK automatic reconnect minUptime, keeping B's
+    // authoritative player record reserved via server.onDrop().
+    b.connection.close(4010, 'Simulated network drop');
+    rooms.splice(rooms.indexOf(b),1); // transport closed; don't call consented leave()
+    await expect.poll(()=>state().players.get(b.sessionId)?.connected).toBe(false);
+    await a.leave();
+    rooms.splice(rooms.indexOf(a),1);
+    await expect.poll(()=>state().hostPlayerId).toBe(c.sessionId);
+  } finally {
+    await Promise.allSettled(rooms.map(room=>room.leave()));
+  }
+});
