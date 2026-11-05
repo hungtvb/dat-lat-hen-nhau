@@ -81,13 +81,13 @@ test('temporary network drop reconnects with the same avatar identity', async ({
 
     // The SDK has a minimum uptime before automatic reconnect is enabled.
     // Chromium's setOffline() does not necessarily close existing WebSockets,
-    // so explicitly end the actual browser transport with a non-consented code.
+    // so explicitly end the actual browser transport with Colyseus's MAY_TRY_RECONNECT (4010).
     await b.waitForTimeout(2500);
     await b.evaluate(() => {
       const sockets=(window as any).__DALAT_TEST_SOCKETS__ as WebSocket[];
       const active=sockets.findLast(socket => socket.readyState === WebSocket.OPEN);
       if (!active) throw new Error('No active Colyseus WebSocket to interrupt');
-      active.close(4102, 'Temporary transport failure (E2E)');
+      active.close(4010, 'Temporary transport failure (E2E)');
     });
     await expect(connectionMark).toHaveText('○', {timeout: 12000});
     await expect(connectionMark).toHaveText('●', {timeout: 25000});
