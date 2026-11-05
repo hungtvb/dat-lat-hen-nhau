@@ -71,7 +71,7 @@ const server = defineServer({
 // response as well as our explicit /api/rooms POST origin guard.
 // Disallowed origins receive no usable Access-Control-Allow-Origin value.
 matchMaker.controller.getCorsHeaders = (req) => {
-  const origin = req.headers.origin;
+  const origin = req.get("origin");
   return {
     "Access-Control-Allow-Origin": origin && allowedOrigins.has(origin) ? origin : "",
     "Vary": "Origin"
