@@ -44,6 +44,7 @@ test('an invalid invite token cannot enter an existing room', async ({browser}) 
 });
 
 test('temporary network drop reconnects with the same avatar identity', async ({browser}) => {
+  test.setTimeout(60000); // includes default Colyseus 5s minUptime + reconnection grace
   const contextA=await browser.newContext();
   const contextB=await browser.newContext();
   // Observe the real WebSocket used by the client without mocking Colyseus messages.
@@ -82,7 +83,7 @@ test('temporary network drop reconnects with the same avatar identity', async ({
     // The SDK has a minimum uptime before automatic reconnect is enabled.
     // Chromium's setOffline() does not necessarily close existing WebSockets,
     // so explicitly end the actual browser transport with Colyseus's MAY_TRY_RECONNECT (4010).
-    await b.waitForTimeout(2500);
+    await b.waitForTimeout(6000);
     await b.evaluate(() => {
       const sockets=(window as any).__DALAT_TEST_SOCKETS__ as WebSocket[];
       const active=sockets.findLast(socket => socket.readyState === WebSocket.OPEN);
