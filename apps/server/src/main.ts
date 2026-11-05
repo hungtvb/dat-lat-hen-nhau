@@ -1,15 +1,49 @@
 import {defineServer, defineRoom, matchMaker} from "colyseus";
-import type {Request, Response} from "express";
+import type {Request, Response, NextFunction} from "express";
 import {LakesideRoom} from "./rooms/LakesideRoom.js";
 import {newInviteToken} from "./security.js";
 
 const port = Number(process.env.PORT || 2567);
 const createHits = new Map<string, number[]>();
 const MAX_ROOM_CREATES_PER_5_MIN = 8;
+// The explicit frontend allowlist is required for browser requests from Vercel.
+// In development, two Vite origins are allowed; deployment sets ALLOWED_ORIGINS.
+const allowedOrigins = new Set(
+  (process.env.ALLOWED_ORIGINS ?? "http://localhost:5173,http://127.0.0.1:5173")
+    .split(",").map(origin => origin.trim()).filter(Boolean)
+);
+// Expire stale per-IP entries even when that IP never sends another request.
+const purge = setInterval(() => {
+  const now = Date.now();
+  for (const [ip, hits] of createHits) {
+    const recent = hits.filter(time => now - time < 300_000);
+    if (recent.length) createHits.set(ip, recent);
+    else createHits.delete(ip);
+  }
+}, 60_000);
+purge.unref();
 
 const server = defineServer({
   rooms: {dalat_lakeside: defineRoom(LakesideRoom)},
   express: (app) => {
+    // Only trust a proxy hop when the deployment explicitly configures it.
+    app.set("trust proxy", process.env.TRUST_PROXY === "1" ? 1 : false);
+    app.use("/api/rooms", (req: Request, res: Response, next: NextFunction) => {
+      const origin = req.header("origin");
+      if (origin && !allowedOrigins.has(origin)) {
+        res.status(403).json({error: "Origin không được phép"}); return;
+      }
+      if (origin) {
+        res.set("Access-Control-Allow-Origin", origin);
+        res.set("Vary", "Origin");
+      }
+      if (req.method === "OPTIONS") {
+        res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+        res.set("Access-Control-Allow-Headers", "Accept, Content-Type");
+        res.status(204).end(); return;
+      }
+      next();
+    });
     app.get("/health", (_req: Request, res: Response) => res.json({ok: true, service: "dalat-hen-nhau"}));
     // Creator obtains roomId + high-entropy secret; player sends secret through join options.
     app.post("/api/rooms", async (req: Request, res: Response) => {
