@@ -23,7 +23,7 @@ test('direct joinById without invite token cannot enter a private room',async ({
       .rejects.toThrow();
     // Denied attempt must not lock the room or occupy a player slot.
     allowed=await client.joinById(roomId,{invite,name:'Người Hợp Lệ',variant:'forest'});
-    await expect.poll(()=>Array.from((allowed!.state as any).players.values()).length).toBe(1);
+    await expect.poll(()=>{const players=(allowed!.state as any)?.players;return players ? Array.from(players.values()).length : -1;}).toBe(1);
   } finally {
     await allowed?.leave();
   }
