@@ -117,3 +117,26 @@ test('host handoff skips disconnected guest during reconnect reservation',async 
     await Promise.allSettled(rooms.map(room=>room.leave()));
   }
 });
+
+test('expired reconnect reservation removes the ghost avatar after 45 seconds',async ({request}) => {
+  test.setTimeout(80000);
+  const {roomId,invite}=await createPrivateRoom(request);
+  const a=await new Client(ORIGIN).joinById(roomId,{invite,name:'Người Ở Lại',variant:'forest'});
+  let b:Room|undefined;
+  try {
+    b=await new Client(ORIGIN).joinById(roomId,{invite,name:'Người Mất Mạng',variant:'sky'});
+    const players=()=>(a.state as any)?.players;
+    await expect.poll(()=>players()?.size ?? 0).toBe(2);
+    const disconnectedId=b.sessionId;
+
+    // Drop before minUptime so Node SDK does not auto-reconnect; room must
+    // reserve this session for its real 45-second production timeout.
+    b.connection.close(4010, 'Simulated persistent transport outage');
+    await expect.poll(()=>players()?.get(disconnectedId)?.connected).toBe(false);
+    await expect.poll(()=>players()?.has(disconnectedId) ?? true, {timeout:65000}).toBe(false);
+    await expect.poll(()=>players()?.size ?? 0).toBe(1);
+  } finally {
+    await a.leave();
+    // B transport is intentionally closed; allowReconnection expiry removes it.
+  }
+});
