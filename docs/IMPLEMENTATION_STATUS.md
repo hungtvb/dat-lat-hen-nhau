@@ -5,10 +5,10 @@
 | Work item | Current evidence | Status |
 |---|---|---|
 | T01 monorepo, typed shared contracts | `package.json` workspaces, tracked `package-lock.json`, 6 contract-test groups in GitHub CI | **CI VERIFIED** |
-| T01 CI workflow | `npm ci`, contract tests, server/web typecheck, build and Playwright E2E passed in [workflow 41998367589](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/41998367589) (`f72a3afd`) | **CI VERIFIED** |
-| T02 private room + invite gate | Real create + join-by-invite with two isolated browser contexts; invalid invite rejected; room full/expiry/direct-ID cases not yet E2E | **PARTIAL E2E VERIFIED** |
+| T01 CI workflow | `npm ci`, 6 contract groups, typecheck, build and **8/8 real Colyseus/Playwright E2E** passed in [workflow 42023515834](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42023515834) (`87281e7`) | **CI VERIFIED** |
+| T02 private room + invite gate | Direct `joinById` without token rejected; invite room survives failed attempt; six guests admitted, seventh rejected, freed seat reusable | **E2E VERIFIED (LOCAL CI)** |
 | T03 server-authoritative movement | Remote avatar position changed in Playwright two-client E2E; speed/replay controls covered only in shared contract tests | **PARTIAL E2E VERIFIED** |
-| T03 client presence / avatar | Two clients observe roster and remote presence; test drops real WebSocket using Colyseus code 4010 after SDK 5s minUptime, then verifies same session ID returns | **E2E VERIFIED (BASIC RECONNECT)** |
+| T03 client presence / avatar | Two-client roster/reconnect identity; **45s timeout cleans ghost avatar**; no reused spawn slot; host handoff skips disconnected guest | **E2E VERIFIED (SCOPED)** |
 | Lobby UI | Browser `page.set_content()` with authored HTML + CSS; screenshots saved 1440px and 390px, no horizontal overflow | **STATIC UI OBSERVED** |
 | T04 polished lakeside art proof | Placeholder only; no GPU camera/lighting/photo review | **NOT STARTED** |
 | T05+ social actions | None | **NOT STARTED** |
@@ -25,9 +25,11 @@ Node.js `v22.16.0`, TypeScript globally installed, Python 3.13.5, Chromium avail
 
 ## Blocking conditions and next gate
 
-**Verified GitHub runner:** Ubuntu, Node 22, `npm ci --no-audit --no-fund`, `npm test` (six groups), `npm run typecheck`, `npm run build`, Chromium Playwright `npm run test:e2e` (3/3 PASS, 19.4s). Evidence: [workflow 41998367589](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/41998367589). Scenarios: M01 two isolated browser contexts with join + synchronized movement, M06 invalid invite token, and M03 subset abnormal WebSocket close/reconnect with same avatar/session ID. For M03 this **does not** prove a 10–20 second physical network outage or full seat reservation (seats not implemented).
+**Verified GitHub runner:** Ubuntu/Node 22, locked `npm ci`, 6 contract test groups, `npm run typecheck`, `npm run build`, and Chromium Playwright `npm run test:e2e` — **8/8 PASS (51.6s)**. [GitHub Actions run 42023515834](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42023515834) on `87281e7`.
 
-**Remaining gates:** Real two-device/WAN connections, 6-person capacity, disconnect beyond reservation time, host handoff, full invite edge cases, real WebGL screenshots/visual inspection and FPS QA. CI can construct Three.js canvas in headless Chromium but this is **not** visual-quality proof. Foundation stays Draft until acceptance/review; do not conflate the placeholder lake with the polished scenic slice. Local environment npm registry DNS remains unavailable, so full app was executed on GitHub runner, not locally here.
+**Covered runtime scenarios:** M01 create/join and server-controlled position visible in a separate browser context; M03 reconnection via real WebSocket close (same session ID); M04 45-second reconnect expiry removes disconnected player from authoritative state (seats not implemented); M05 sixth join accepted/seventh rejected and freed spot reused; M06 invalid/no token rejected and an unauthorized pre-host attempt does **not** dispose the room; M07 connected host promoted when previous host leaves while another guest is disconnected; joining after departure does not reuse occupied spawn slot. These run on **one GitHub CI runner**, not physical devices or WAN.
+
+**Remaining review gates:** independent real-device/WAN test, capacity/latency/performance on target laptop, 3–6 people playtest, stronger input-abuse/join throttling, HTTP create limiter memory bounds, terminal client cleanup UX and WebGL screenshot/visual inspection. Client/world social features, chairs/emotes/chat/photo and art proof are not implemented. PR #1 remains Draft until outstanding launch criteria are reviewed; no GPU visual PASS is claimed.
 
 ## Security caveats
 

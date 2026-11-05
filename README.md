@@ -4,7 +4,7 @@ Một thế giới 3D nhẹ nhàng dành cho nhóm bạn muốn đi dạo Đà L
 
 ## Trạng thái
 
-**Foundation / network spike (2026-11-05).** GitHub CI đã chạy ứng dụng Colyseus + Three.js trong Chromium và đạt **3/3 bài E2E**: hai người vào cùng phòng/đồng bộ di chuyển, từ chối token sai và tự reconnect giữ nguyên avatar. [Bằng chứng CI](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/41998367589). Đây chưa phải kiểm thử hai thiết bị qua Internet hay visual QA. Cảnh hiện tại vẫn là geometry placeholder, không phải art proof Đà Lạt. Chi tiết: [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md).
+**Foundation / network spike (2026-11-05).** GitHub CI đã chạy ứng dụng Colyseus + Three.js trong Chromium và đạt **8/8 bài E2E**: đồng bộ hai người, token mời hợp lệ, room đủ sáu người, reconnect, timeout 45 giây, host handoff và chống spawn trùng. [Bằng chứng CI](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42023515834). Đây chưa phải kiểm thử hai thiết bị qua Internet hay visual QA. Cảnh hiện tại vẫn là geometry placeholder, không phải art proof Đà Lạt. Chi tiết: [`docs/IMPLEMENTATION_STATUS.md`](docs/IMPLEMENTATION_STATUS.md).
 
 ## Chạy trên máy có internet
 
@@ -33,7 +33,7 @@ npx playwright install chromium
 npm run test:e2e           # starts local server + web; requires dependencies & WebGL
 ```
 
-GitHub Actions chạy thành công `npm ci`, contract tests, typecheck, build và **3/3 Playwright E2E** với hai browser context trên cùng runner. Máy đóng gói cục bộ vẫn không truy cập npm registry, nên chưa chạy full app ở môi trường đó. Chưa có kiểm thử hai thiết bị vật lý qua Internet, độ trễ WAN hoặc review hình ảnh WebGL thực.
+GitHub Actions chạy thành công `npm ci`, contract tests, typecheck, build và **8/8 Playwright E2E** với hai browser context trên cùng runner. Máy đóng gói cục bộ vẫn không truy cập npm registry, nên chưa chạy full app ở môi trường đó. Chưa có kiểm thử hai thiết bị vật lý qua Internet, độ trễ WAN hoặc review hình ảnh WebGL thực.
 
 ## Cấu trúc
 
@@ -43,13 +43,13 @@ apps/web/                Vite/Three.js game + lobby/invite interface
 packages/shared/         Runtime contracts và validation functions
 world/                   Scene specification nghệ thuật đã duyệt
 tests/integration/       Pure domain-contract tests
-tests/e2e/               Two-browser Playwright scenarios (3/3 passed in CI)
+tests/e2e/               Playwright multiplayer/room regression (8/8 passed in CI)
 docs/                    GDD, art direction, architecture, QA, implementation evidence
 ```
 
 ## Giới hạn hiện tại
 
-- Colyseus room và đồng bộ di chuyển đã được kiểm thử E2E trên CI; chưa kiểm thử hai máy thực tế, full room limit, reconnect quá hạn hay performance GPU.
+- Colyseus room và đồng bộ di chuyển đã được kiểm thử E2E trên CI; chưa kiểm thử hai máy thực tế, mạng WAN, GPU performance hay lỗi abuse ở mức production.
 - Avatar, địa hình, hồ, thông vẫn là placeholder; chưa có ghế ngồi, emote, chat, photo mode, thời tiết hay audio.
 - Auth chỉ dùng invite token ngẫu nhiên; phiên bản public vẫn cần threat model, load/abuse testing và cơ chế observability.
 - Phần phục vụ trải nghiệm nhóm bạn được tiếp tục theo các mục T02–T07 trong [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md); không tự đánh dấu mục nào PASS khi chưa có hai client thật.

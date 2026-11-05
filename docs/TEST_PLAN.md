@@ -1,6 +1,6 @@
 # QA / Acceptance Test Plan — Đà Lạt Hẹn Nhau
 
-**Status:** Mixed test plan and actual CI evidence as of 2026-11-05. Three Playwright E2E scenarios passed on GitHub Actions ([run 41998367589](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/41998367589)). Unlisted scenarios remain **NOT RUN**. The prior offline prototype `Đà Lạt Trong Mơ` does not count as multiplayer evidence.
+**Status:** Eight genuine Colyseus/Playwright E2E scenarios passed on GitHub Actions ([run 42023515834](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42023515834), 8/8). These scenarios run on one CI runner, not multiple physical devices. Uncovered acceptance cases remain NOT RUN, and the prior offline prototype does not count as multiplayer evidence.
 
 ## 1. Test matrix — highest priority
 
@@ -25,13 +25,17 @@
 
 ## Verified network subset (2026-11-05)
 
-| Scenario | Actual test evidence | Boundary |
+| Scenario | Evidence | Boundary |
 |---|---|---|
-| M01 partial | A creates room, B joins using invite, both rosters show 2/6, B sees A's server-controlled movement | Same CI runner with **two separate browser contexts**, not two physical devices |
-| M03 partial | B's real WebSocket closes with Colyseus `MAY_TRY_RECONNECT` (4010) after SDK `minUptime=5000ms`; A sees disconnected/connected and same session ID after recovery | Not a physical 10–20s outage; no seats implemented |
-| M06 partial | Invalid invite token is rejected and host roster remains 1/6 | Expired token and direct room-ID attempts not yet covered |
+| M01 partial | A/B join a real private room; two browser contexts observe same roster and server-controlled movement | Not two physical devices/WAN |
+| M03 partial | Socket close with 4010 after SDK minUptime, automatic reconnect preserves exact session ID | Not physical 10–20s outage; no seats |
+| M04 partial | Dropped Node SDK client remains disconnected and is removed after actual 45s reconnect timeout | No bench seat reservation implemented |
+| M05 | Six SDK clients join; seventh rejected; departed client's seat becomes joinable | Single CI host, no load test |
+| M06 partial | Invalid invite and direct no-token `joinById` rejected; failed initial access does not destroy room | Token expiration policy not implemented |
+| M07 partial | Host A leaves while B is disconnected and C online; host becomes C, not B | No ambience-changing host UI yet |
+| Spawn regression | A/B/C join; B leaves; D enters with different spawn position from active A/C | No collision/navmesh test |
 
-Other network and social test rows are **NOT RUN** or not yet implemented. Full visual QA V01–V08 is **NOT RUN**. Passing headless Chromium browser integration is not equivalent to GPU screenshot review or a WAN group playtest.
+**Full visual QA V01–V08: NOT RUN.** Passing headless Chromium does not establish real-GPU visuals or 3–6-person WAN experience. M02, M08, most M03/04/07 criteria, S01–S08 and public abuse/performance gates remain NOT RUN / not implemented.
 
 ## 2. Visual test matrix, actual render evidence required
 
