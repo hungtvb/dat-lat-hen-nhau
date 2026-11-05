@@ -1,0 +1,71 @@
+{
+  "schema_version": "0.1-design-only",
+  "game": "Da Lat Hen Nhau",
+  "world_id": "xuan-huong-lakeside-v1",
+  "status": "proposed_not_implemented",
+  "representation": "artistic interpretation; not an actual GIS map or accurate navigation",
+  "coordinate_system": {
+    "unit": "meter",
+    "axes": { "x": "east-artistic", "y": "up", "z": "north-artistic" },
+    "bounds": { "width_x": 300, "depth_z": 220 },
+    "world_origin": "lakeside meet-up platform"
+  },
+  "player_count": { "min": 1, "normal_group": 4, "max": 6 },
+  "walking": { "max_speed_m_per_s": 2.2, "trail_length_m_estimate": [220, 280], "no_sprint_v1": true },
+  "places": [
+    {
+      "id": "meet-by-lake",
+      "name": "Điểm hẹn ven hồ",
+      "local_pos": { "x": -94, "y": 2, "z": -14 },
+      "type": "spawn-and-meet",
+      "capacity": 6,
+      "camera_shot": "six friends with lake/hill backdrop",
+      "interactions": ["wave", "photo"]
+    },
+    {
+      "id": "pine-trail",
+      "name": "Đường thông",
+      "local_pos": { "x": -24, "y": 4, "z": -4 },
+      "type": "walking",
+      "capacity": 6,
+      "camera_shot": "pine framing and lake reflections",
+      "interactions": ["sit", "photo", "point"],
+      "seats": ["pine-bench-left", "pine-bench-right"]
+    },
+    {
+      "id": "cafe-goc-suong",
+      "name": "Cà phê Góc Sương (fictional)",
+      "local_pos": { "x": 84, "y": 14, "z": 36 },
+      "type": "rest-and-group-photo",
+      "capacity": 6,
+      "camera_shot": "warm cafe balcony with distant Lam Vien silhouette",
+      "interactions": ["sit", "photo", "point", "emote"],
+      "seats": ["cafe-chair-1", "cafe-chair-2", "cafe-chair-3", "cafe-chair-4", "cafe-chair-5", "cafe-chair-6"]
+    }
+  ],
+  "scene_entities": [
+    "terrain-rolling-highland",
+    "water-xuan-huong-inspired",
+    "walkway-stone",
+    "pine-forest-instanced-and-hero-trees",
+    "cafeteria-facade",
+    "lam-vien-in-distance-artistic-silhouette",
+    "hills-background-3-layer",
+    "small-terrace-lights"
+  ],
+  "source_3dviz_record_ids_consulted": [
+    "knowledge.blueprint-tree-conifer",
+    "knowledge.material-water-surface-cues",
+    "knowledge.camera-orbit-follow-rig",
+    "knowledge.style-stylized-realism",
+    "knowledge.motion-style-with-state-legibility",
+    "knowledge.theme-fantasy-woodland"
+  ],
+  "lighting_presets": ["morning-mist", "clear-afternoon", "purple-dusk"],
+  "authoritative_state": {
+    "server": ["players", "seats", "environmentPreset", "hostPlayerId"],
+    "client": ["camera", "photoMode", "graphicsPreset", "audioSettings", "uiState"]
+  },
+  "render_qa": ["actual-webgl-capture-overview", "pine-closeup", "water-closeup", "avatar-pose-extremes", "twilight-exposure", "low-high-performance"],
+  "rights_note": "Use authored or expressly licensed assets; do not embed editorial/stock photos by default"
+}

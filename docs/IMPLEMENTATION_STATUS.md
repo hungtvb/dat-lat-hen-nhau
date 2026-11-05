@@ -1,0 +1,36 @@
+# Implementation Status — 2026-11-05
+
+**Scope:** T01 bootstrap + typed contracts and staged T02/T03 Colyseus + Three.js network vertical slice. This local artifact was made after the GDD/architecture review. No GitHub repository or PR has been supplied for this game; all edits are local.
+
+| Work item | Current evidence | Status |
+|---|---|---|
+| T01 monorepo, typed shared contracts | `package.json` workspaces; `packages/shared` compiled with global TypeScript compiler; 6 domain test groups passed | **PARTIAL VERIFIED** |
+| T01 CI workflow | `.github/workflows/ci.yml` created; no GitHub repository/run/lockfile | **CODED / NOT RUN** |
+| T02 private room + invite gate | `apps/server/src/main.ts`, `LakesideRoom.ts`, token digest and validation | **CODED / NOT RUN** |
+| T03 server-authoritative movement | `moveInput` validation; 20Hz simulation loop, 2.2m/s clamp and replay sequence guard | **CODED / NOT RUN** |
+| T03 client presence / avatar | `apps/web/src/network` + `apps/web/src/game/World.ts` | **CODED / NOT RUN** |
+| Lobby UI | Browser `page.set_content()` with authored HTML + CSS; screenshots saved 1440px and 390px, no horizontal overflow | **STATIC UI OBSERVED** |
+| T04 polished lakeside art proof | Placeholder only; no GPU camera/lighting/photo review | **NOT STARTED** |
+| T05+ social actions | None | **NOT STARTED** |
+
+## Verified local commands
+
+Node.js `v22.16.0`, TypeScript globally installed, Python 3.13.5, Chromium available through Playwright.
+
+1. `tsc -p packages/shared/tsconfig.json` → exit 0; generated `packages/shared/dist`.
+2. `node --test tests/integration/contracts.test.mjs` → **6 test groups passed**, 0 failures.
+3. TypeScript syntax parser over 10 source `.ts` files → **0 syntax errors**. This is not a dependency-resolved typecheck.
+4. PostCSS parsed authored CSS → **93 style nodes**, 0 parse errors (before final readable-text overrides).
+5. Headless Chromium `page.set_content` with the authored HTML+CSS (no JS runtime) → desktop 1440/1440 and mobile 390/390 scroll/client width. Images: `docs/evidence/lobby-desktop.png`, `lobby-mobile.png`.
+
+## Blocking conditions and next gate
+
+Network DNS resolution `registry.npmjs.org` failed with `EAI_AGAIN`, so `npm install` was not possible. Server/Three.js Vite runtime, app typecheck and two-browser multiplayer scenarios have **not run**. Static screenshot cannot certify functionality. To proceed, install dependencies on a networked machine; run `npm test`, `npm run typecheck`, `npm run build`, and `npm run test:e2e`; fix any issues, then attach Playwright trace / server logs. Generate and commit `package-lock.json`, change CI `npm install` → `npm ci`, then close T01. Do not begin art proof until at least two independent clients have a verified shared room and movement.
+
+## Security caveats
+
+- Invite token stays in URL fragment and is sent only as a join option (not query string). It is never logged intentionally.
+- Direct `joinById` is still gated by `LakesideRoom.onAuth`, and no public create/join-or-create matchmaker methods are exposed.
+- Creation rate limit is currently an in-memory per-process development safeguard; production still needs reverse-proxy/application-layer abuse limits.
+- No login, persistent store, voice chat, photo upload, or personal analytics.
+- No external assets or geographic claims incorporated into runtime; current world is symbolic geometry.

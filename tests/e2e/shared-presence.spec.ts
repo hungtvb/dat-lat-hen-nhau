@@ -1,0 +1,44 @@
+import {test,expect} from '@playwright/test';
+
+/** Real room + two isolated browser contexts. Not a mocked network test. */
+test('two friends share a room and see authoritative movement', async ({browser}) => {
+  const contextA=await browser.newContext();
+  const contextB=await browser.newContext();
+  try {
+    const a=await contextA.newPage(); const b=await contextB.newPage();
+    await a.goto('/');
+    await a.locator('#nickname').fill('Mây Nhỏ');
+    await a.locator('#join-button').click();
+    await expect(a.locator('#world')).toBeVisible();
+    const invite=a.url();
+    expect(invite).toContain('#room=');
+    await b.goto(invite);
+    await b.locator('#nickname').fill('Nắng Sớm');
+    await b.locator('#join-button').click();
+    await expect(b.locator('#world')).toBeVisible();
+    await expect(a.locator('#player-list')).toContainText('Nắng Sớm');
+    await expect(b.locator('#player-list')).toContainText('Mây Nhỏ');
+    await expect(a.locator('#room-status')).toContainText('2/6');
+    await expect(b.locator('#room-status')).toContainText('2/6');
+    const before=await b.evaluate(() => (window as any).__DALAT_DEBUG__.players().find((p:any)=>p.name==='Mây Nhỏ')?.z);
+    expect(typeof before).toBe('number');
+    // Focus render canvas so keyboard controls are not captured by lobby fields.
+    await a.locator('#viewport canvas').click();
+    await a.keyboard.down('w'); await a.waitForTimeout(550); await a.keyboard.up('w');
+    await expect.poll(async()=>b.evaluate(() => (window as any).__DALAT_DEBUG__.players().find((p:any)=>p.name==='Mây Nhỏ')?.z)).toBeLessThan(before-.15);
+  } finally {await contextA.close();await contextB.close();}
+});
+
+test('an invalid invite token cannot enter an existing room', async ({browser}) => {
+  const c1=await browser.newContext(); const c2=await browser.newContext();
+  try {
+    const a=await c1.newPage();const b=await c2.newPage();
+    await a.goto('/');await a.locator('#nickname').fill('Người Mời');await a.locator('#join-button').click();
+    await expect(a.locator('#world')).toBeVisible();
+    const url=new URL(a.url());const query=new URLSearchParams(url.hash.slice(1));query.set('invite','x'.repeat(32));url.hash=query.toString();
+    await b.goto(url.toString());await b.locator('#nickname').fill('Khách Lạ');await b.locator('#join-button').click();
+    await expect(b.locator('#join-error')).toBeVisible();
+    await expect(b.locator('#world')).toBeHidden();
+    await expect(a.locator('#room-status')).toContainText('1/6');
+  } finally {await c1.close();await c2.close();}
+});
