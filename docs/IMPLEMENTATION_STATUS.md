@@ -1,11 +1,11 @@
 # Implementation Status — 2026-11-05
 
-**Scope:** T01 bootstrap + typed contracts and staged T02/T03 Colyseus + Three.js network vertical slice. This local artifact was made after the GDD/architecture review. No GitHub repository or PR has been supplied for this game; all edits are local.
+**Scope:** T01 bootstrap + typed contracts and staged T02/T03 Colyseus + Three.js network vertical slice. This local artifact was made after the GDD/architecture review. Repository `hungtvb/dat-lat-hen-nhau` is now initialized. Application source is committed on `feat/multiplayer-foundation` for a draft PR; this does not prove runtime multiplayer works.
 
 | Work item | Current evidence | Status |
 |---|---|---|
 | T01 monorepo, typed shared contracts | `package.json` workspaces; `packages/shared` compiled with global TypeScript compiler; 6 domain test groups passed | **PARTIAL VERIFIED** |
-| T01 CI workflow | `.github/workflows/ci.yml` created; no GitHub repository/run/lockfile | **CODED / NOT RUN** |
+| T01 CI workflow | `.github/workflows/ci.yml` committed on feature branch; CI outcome and lockfile still pending | **CODED / NOT RUN** |
 | T02 private room + invite gate | `apps/server/src/main.ts`, `LakesideRoom.ts`, token digest and validation | **CODED / NOT RUN** |
 | T03 server-authoritative movement | `moveInput` validation; 20Hz simulation loop, 2.2m/s clamp and replay sequence guard | **CODED / NOT RUN** |
 | T03 client presence / avatar | `apps/web/src/network` + `apps/web/src/game/World.ts` | **CODED / NOT RUN** |
@@ -21,7 +21,7 @@ Node.js `v22.16.0`, TypeScript globally installed, Python 3.13.5, Chromium avail
 2. `node --test tests/integration/contracts.test.mjs` → **6 test groups passed**, 0 failures.
 3. TypeScript syntax parser over 10 source `.ts` files → **0 syntax errors**. This is not a dependency-resolved typecheck.
 4. PostCSS parsed authored CSS → **93 style nodes**, 0 parse errors (before final readable-text overrides).
-5. Headless Chromium `page.set_content` with the authored HTML+CSS (no JS runtime) → desktop 1440/1440 and mobile 390/390 scroll/client width. Images: `docs/evidence/lobby-desktop.png`, `lobby-mobile.png`.
+5. Headless Chromium `page.set_content` with the authored HTML+CSS (no JS runtime) → desktop 1440/1440 and mobile 390/390 scroll/client width. Images from the local source bundle: `docs/evidence/lobby-desktop.png`, `lobby-mobile.png`; GitHub import currently contains the HTML preview only, not these two PNG artifacts.
 
 ## Blocking conditions and next gate
 
