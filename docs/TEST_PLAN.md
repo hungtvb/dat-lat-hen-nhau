@@ -1,6 +1,6 @@
 # QA / Acceptance Test Plan — Đà Lạt Hẹn Nhau
 
-**Status:** Test specifications only. Chưa có multiplayer implementation; **tất cả outcome là NOT RUN**. Test trước thuộc game offline `Đà Lạt Trong Mơ` **không chứng minh** các tiêu chí này.
+**Status:** Eight genuine Colyseus/Playwright E2E scenarios passed on GitHub Actions ([run 42023515834](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42023515834), 8/8). These scenarios run on one CI runner, not multiple physical devices. Uncovered acceptance cases remain NOT RUN, and the prior offline prototype does not count as multiplayer evidence.
 
 ## 1. Test matrix — highest priority
 
@@ -22,6 +22,20 @@
 | S06 | A opens photo mode while B moves/emotes | A can save PNG representing A's frame; B is not frozen | E2E image |
 | S07 | Player with duplicate display name joins | players remain separately identifiable; no state overwrite | E2E 2-client |
 | S08 | User clicks Help/Photo/Settings during walking | no stuck input, escape route works; focus returns correctly | E2E UX |
+
+## Verified network subset (2026-11-05)
+
+| Scenario | Evidence | Boundary |
+|---|---|---|
+| M01 partial | A/B join a real private room; two browser contexts observe same roster and server-controlled movement | Not two physical devices/WAN |
+| M03 partial | Socket close with 4010 after SDK minUptime, automatic reconnect preserves exact session ID | Not physical 10–20s outage; no seats |
+| M04 partial | Dropped Node SDK client remains disconnected and is removed after actual 45s reconnect timeout | No bench seat reservation implemented |
+| M05 | Six SDK clients join; seventh rejected; departed client's seat becomes joinable | Single CI host, no load test |
+| M06 partial | Invalid invite and direct no-token `joinById` rejected; failed initial access does not destroy room | Token expiration policy not implemented |
+| M07 partial | Host A leaves while B is disconnected and C online; host becomes C, not B | No ambience-changing host UI yet |
+| Spawn regression | A/B/C join; B leaves; D enters with different spawn position from active A/C | No collision/navmesh test |
+
+**Full visual QA V01–V08: NOT RUN.** Passing headless Chromium does not establish real-GPU visuals or 3–6-person WAN experience. M02, M08, most M03/04/07 criteria, S01–S08 and public abuse/performance gates remain NOT RUN / not implemented.
 
 ## 2. Visual test matrix, actual render evidence required
 
@@ -60,7 +74,7 @@
 | PROPOSED | Chỉ có requirement/plan |
 | CODED | Có code nhưng chưa chạy |
 | AUTOMATED TEST PASS | Có command, environment, log pass |
-| E2E OBSERVED | Hai trình duyệt với network thật đã xem tương tác |
+| E2E OBSERVED | Real client/server interactions verified in independent browser contexts; report device/network constraints separately |
 | GPU VISUALLY INSPECTED | Screenshot/video thực từ renderer WebGL trên thiết bị được xác định |
 | PLAYER VALIDATED | Nhóm người chơi đã xác nhận cảm giác đi cùng nhau |
 

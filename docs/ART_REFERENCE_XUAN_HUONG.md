@@ -41,6 +41,13 @@ Use the *linked source pages* as the reference board. They identify an observed 
 
 **Correction to previous art spec:** The original scene study treated “pine trail → café → Lâm Viên visible across lake” as one continuous postcard. That is a **creative possibility**, not verified local geography. Require multi-angle validation before labelling any shot a faithful reconstruction.
 
+## Priority decision for D2 implementation (2026-11-05)
+
+- **D2-A / SHOT-01 first:** construct only a 30–40 m shoreline meeting scene within current server x,z ±22 m bounds. One mature asymmetric pine, curved bank, walkable path, calm water and 2–6 real connected avatars. No café, interactive bench or invented plaza panorama.
+- **D2-B / SHOT-02 after image review:** extend path toward 60–100 m, **together with** server-authoritative movement bounds and E2E; a pretty but unwalkable path is not acceptable.
+- **SHOT-03 conditional:** keep unverified Lâm Viên camera location blocked until source-aligned views are available. Position relative to lake is known broadly; specific line-of-sight from game camera is not.
+- Proposed authoring and QA detail: [D2_SCENIC_SLICE_IMPLEMENTATION_DETAIL.md](D2_SCENIC_SLICE_IMPLEMENTATION_DETAIL.md). No new 3D/rendered evidence yet.
+
 ## 4. Three composition plates / approval shots
 
 These are **authoring requirements**, not images we have rendered. Use IDs in `world/reference-shots.json`.
@@ -79,7 +86,7 @@ These are **authoring requirements**, not images we have rendered. Use IDs in `w
 5. **Lighting:** morning mist, afternoon and dusk are distinct configurations. Keep source directions/receivers consistent in a fixed A/B/C camera comparison. Maintain visible faces, avatars and paved route in mist.
 6. **Visual proof:** first deliver 3 in-engine screenshots labelled SHOT-01/02/03 and a short comparison against the linked references; then review actual model silhouette, shadows and camera occlusion. Only after that build out the rest of the zone.
 
-**Process dependency:** PR #1 (`feat/multiplayer-foundation`) still has failed TypeScript CI and has not passed true two-browser E2E. This reference study is docs-only; **it does not imply permission to bypass the multiplayer acceptance gate or start production 3D implementation.**
+**Process update (2026-11-05):** PR #1 đã qua `npm ci`, typecheck, build và 8/8 Colyseus/Playwright E2E ([run 42024094826](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42024094826)), nhưng hai thiết bị vật lý/WAN và visual GPU chưa được kiểm chứng. Tài liệu art chỉ là kế hoạch; cần duyệt [D2 Implementation Detail](D2_SCENIC_SLICE_IMPLEMENTATION_DETAIL.md) trước khi thay đổi lớn tới Three.js.
 
 ## 6. Acceptance checks & gaps
 

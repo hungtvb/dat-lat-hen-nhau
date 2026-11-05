@@ -35,12 +35,18 @@ export async function joinRoom(invite: Invite, guest: Guest): Promise<Room> {
 export function listenPlayers(room: Room, onAdd: (id:string, player:SyncedPlayer)=>void, onChange: (id:string, player:SyncedPlayer)=>void, onRemove:(id:string)=>void): () => void {
   const cb = Callbacks.get(room);
   const detach: Array<() => void> = [];
-  detach.push(cb.onAdd("players", (player: SyncedPlayer, id:string) => {
-    onAdd(id, player);
+  // Without a typed room schema, the Colyseus SDK exposes map values as unknown.
+  // Narrow the session key and cast only the server-owned player schema at the boundary.
+  detach.push(cb.onAdd("players", (value, key) => {
+    if (typeof key !== "string") return;
+    const player = value as SyncedPlayer;
+    onAdd(key, player);
     for (const field of ["x", "z", "heading", "name", "variant", "connected", "locomotion"]) {
-      detach.push(cb.listen(player, field as keyof SyncedPlayer, () => onChange(id, player)));
+      detach.push(cb.listen(player, field as keyof SyncedPlayer, () => onChange(key, player)));
     }
   }));
-  detach.push(cb.onRemove("players", (_player: SyncedPlayer, id:string) => onRemove(id)));
+  detach.push(cb.onRemove("players", (_value, key) => {
+    if (typeof key === "string") onRemove(key);
+  }));
   return () => detach.forEach(fn => fn());
 }

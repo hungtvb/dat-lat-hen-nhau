@@ -112,4 +112,6 @@ See **[ART_REFERENCE_XUAN_HUONG.md](ART_REFERENCE_XUAN_HUONG.md)** for eight rea
 
 **Important clarification:** The pine-framed bank, fictional `Cà phê Góc Sương`, and distant Lâm Viên plaza have **not been verified as simultaneously visible from one real camera location**. Treat the old continuous route diagram as a *design proposal*, not a geographically measured walk. Validate photo viewpoints before asserting a faithful reconstruction; use an explicitly labelled artistic composite if they cannot be reconciled.
 
-This change is research-only. No new 3D assets or runtime tests were produced.
+**Thứ tự triển khai:** D2-A SHOT-01 (30–40 m trong bounds hiện có) → review screenshot từ ứng dụng → D2-B SHOT-02 (60–100 m, yêu cầu cập nhật bounds phía server) → SHOT-03 chỉ khi được xác minh viewpoint. Xem [D2 Scenic Slice Implementation Detail](D2_SCENIC_SLICE_IMPLEMENTATION_DETAIL.md). 
+
+This PR updates research and implementation planning only. No new 3D assets, runtime changes, or visually inspected WebGL frames have been produced.

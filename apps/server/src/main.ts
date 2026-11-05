@@ -1,4 +1,5 @@
 import {defineServer, defineRoom, matchMaker} from "colyseus";
+import type {Request, Response} from "express";
 import {LakesideRoom} from "./rooms/LakesideRoom.js";
 import {newInviteToken} from "./security.js";
 
@@ -9,9 +10,9 @@ const MAX_ROOM_CREATES_PER_5_MIN = 8;
 const server = defineServer({
   rooms: {dalat_lakeside: defineRoom(LakesideRoom)},
   express: (app) => {
-    app.get("/health", (_req, res) => res.json({ok: true, service: "dalat-hen-nhau"}));
+    app.get("/health", (_req: Request, res: Response) => res.json({ok: true, service: "dalat-hen-nhau"}));
     // Creator obtains roomId + high-entropy secret; player sends secret through join options.
-    app.post("/api/rooms", async (req, res) => {
+    app.post("/api/rooms", async (req: Request, res: Response) => {
       const ip = req.ip || req.socket.remoteAddress || "unknown";
       const now = Date.now();
       const attempts = (createHits.get(ip) ?? []).filter(x => now - x < 300000);

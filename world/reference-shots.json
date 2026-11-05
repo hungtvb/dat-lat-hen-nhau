@@ -1,6 +1,6 @@
 {
   "schema_version": "0.1-reference-study",
-  "status": "design_only_not_rendered",
+  "status": "design_review_pending_no_engine_capture",
   "game": "Da Lat Hen Nhau",
   "scene_id": "xuan-huong-lakeside-v1",
   "document": "docs/ART_REFERENCE_XUAN_HUONG.md",
@@ -39,7 +39,8 @@
         "one disk-like lake with sharp uniform edge",
         "avatars clipped into shoreline"
       ],
-      "proof": "in_engine_16_9_screenshot_plus_reference_comparison"
+      "proof": "in_engine_16_9_screenshot_plus_reference_comparison",
+      "readiness": "D2-A first scene art-proof; implementation plan awaiting review"
     },
     {
       "id": "SHOT-02",
@@ -62,13 +63,14 @@
         "arbitrary floating paths",
         "trees obscuring camera/entire route"
       ],
-      "proof": "in_engine_walkthrough_and_still_screenshot"
+      "proof": "in_engine_walkthrough_and_still_screenshot",
+      "readiness": "D2-B after SHOT-01 art approval and authoritative bounds review"
     },
     {
       "id": "SHOT-03",
       "name": "Nhin ve quang truong",
       "type": "landmark",
-      "camera_location_status": "to_be_calibrated_and_verified_for_visibility",
+      "camera_location_status": "unverified_shot_blocked",
       "reference_ids": [
         "R03",
         "R04",
@@ -86,7 +88,8 @@
         "incorrect single uniform dome as landmark",
         "declaring geographic accuracy without camera evidence"
       ],
-      "proof": "source_aligned_daylight_screenshot_plus_viewpoint_note"
+      "proof": "source_aligned_daylight_screenshot_plus_viewpoint_note",
+      "readiness": "hold until ground-level viewpoint/sightline verified"
     }
   ],
   "lighting_modes": [
@@ -95,22 +98,38 @@
     "purple-dusk"
   ],
   "production_sequence": [
-    "photo viewpoint validation",
-    "graybox shoreline/landform/path",
-    "hero pine silhouette",
-    "lake water materials",
-    "distant plaza architecture",
-    "in-engine visual QA"
+    "SHOT-01 curved shoreline and playable greybox",
+    "SHOT-01 custom mature branching hero pine",
+    "SHOT-01 water, distant shore, morning mist",
+    "same-camera real WebGL visual review",
+    "SHOT-02 route plus server-authoritative bounds validation",
+    "SHOT-03 only with grounded camera proof"
   ],
   "dependencies": [
-    "PR #1 CI typecheck/build pass",
-    "two-browser multiplayer E2E",
-    "WebGL screenshot acceptance before main art expansion"
+    "PR #1 locked install/build/8 E2E PASS on 2026-11-05 (CI 42024094826)",
+    "PR #1 remains Draft; do not merge PR #2 to main ahead of the approved foundation",
+    "SHOT-01 D2-A keep within 44x44m server-authoritative bounds",
+    "SHOT-02 60-100m path requires coordinated server movement bounds regression",
+    "device/GPU screenshots and visual approval still NOT RUN",
+    "review significant code implementation plan before D2 3D code"
   ],
   "source_3dviz_records": [
     "knowledge.blueprint-tree-conifer",
     "knowledge.terrain-landmark-rhythm",
     "knowledge.navigable-density-rest-areas",
     "references/lighting-direction-and-scale.md"
-  ]
+  ],
+  "execution_order": [
+    "SHOT-01",
+    "SHOT-02",
+    "SHOT-03-conditional"
+  ],
+  "first_proof": {
+    "id": "D2-A",
+    "shot_id": "SHOT-01",
+    "extent": "30-40m local visual scene within existing +/-22m server movement bounds",
+    "plan": "docs/D2_SCENIC_SLICE_IMPLEMENTATION_DETAIL.md",
+    "assets": "original modelling or independently verified reusable licenses",
+    "status": "not_implemented_not_rendered"
+  }
 }

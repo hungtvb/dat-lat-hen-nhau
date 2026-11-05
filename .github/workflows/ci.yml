@@ -1,23 +1,39 @@
-name: Core contracts and build
+name: Core contracts, build and browser integration
 on:
   push:
     branches: [main]
   pull_request:
+permissions:
+  contents: read
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      # Bootstrap iteration: lockfile cannot be generated in the isolated workspace.
-      # Replace npm install with npm ci as soon as package-lock.json has been generated.
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
       - name: Contract tests
         run: npm test
       - name: App type checks
         run: npm run typecheck
       - name: Build client and server
         run: npm run build
+      - name: Install Chromium for genuine browser E2E
+        run: npx playwright install --with-deps chromium
+      - name: Multiplayer tests (two isolated browser contexts)
+        run: npm run test:e2e
+      - name: Upload Playwright diagnostics
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-evidence
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7

@@ -1,14 +1,14 @@
 # Implementation Status — 2026-11-05
 
-**Scope:** T01 bootstrap + typed contracts and staged T02/T03 Colyseus + Three.js network vertical slice. This local artifact was made after the GDD/architecture review. Repository `hungtvb/dat-lat-hen-nhau` is now initialized. Application source is committed on `feat/multiplayer-foundation` for a draft PR; this does not prove runtime multiplayer works.
+**Scope:** T01 bootstrap + typed contracts and staged T02/T03 Colyseus + Three.js network vertical slice. Repository `hungtvb/dat-lat-hen-nhau` has an active draft foundation PR. GitHub Actions has now executed real Colyseus + Chromium tests against the server/client; this is evidence for the network slice, **not** a finished game or multi-device WAN release.
 
 | Work item | Current evidence | Status |
 |---|---|---|
-| T01 monorepo, typed shared contracts | `package.json` workspaces; `packages/shared` compiled with global TypeScript compiler; 6 domain test groups passed | **PARTIAL VERIFIED** |
-| T01 CI workflow | `.github/workflows/ci.yml` committed on feature branch; CI outcome and lockfile still pending | **CODED / NOT RUN** |
-| T02 private room + invite gate | `apps/server/src/main.ts`, `LakesideRoom.ts`, token digest and validation | **CODED / NOT RUN** |
-| T03 server-authoritative movement | `moveInput` validation; 20Hz simulation loop, 2.2m/s clamp and replay sequence guard | **CODED / NOT RUN** |
-| T03 client presence / avatar | `apps/web/src/network` + `apps/web/src/game/World.ts` | **CODED / NOT RUN** |
+| T01 monorepo, typed shared contracts | `package.json` workspaces, tracked `package-lock.json`, 6 contract-test groups in GitHub CI | **CI VERIFIED** |
+| T01 CI workflow | `npm ci`, 6 contract groups, typecheck, build and **8/8 real Colyseus/Playwright E2E** passed in [workflow 42023515834](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42023515834) (`87281e7`) | **CI VERIFIED** |
+| T02 private room + invite gate | Direct `joinById` without token rejected; invite room survives failed attempt; six guests admitted, seventh rejected, freed seat reusable | **E2E VERIFIED (LOCAL CI)** |
+| T03 server-authoritative movement | Remote avatar position changed in Playwright two-client E2E; speed/replay controls covered only in shared contract tests | **PARTIAL E2E VERIFIED** |
+| T03 client presence / avatar | Two-client roster/reconnect identity; **45s timeout cleans ghost avatar**; no reused spawn slot; host handoff skips disconnected guest | **E2E VERIFIED (SCOPED)** |
 | Lobby UI | Browser `page.set_content()` with authored HTML + CSS; screenshots saved 1440px and 390px, no horizontal overflow | **STATIC UI OBSERVED** |
 | T04 polished lakeside art proof | Placeholder only; no GPU camera/lighting/photo review | **NOT STARTED** |
 | T05+ social actions | None | **NOT STARTED** |
@@ -25,7 +25,11 @@ Node.js `v22.16.0`, TypeScript globally installed, Python 3.13.5, Chromium avail
 
 ## Blocking conditions and next gate
 
-Network DNS resolution `registry.npmjs.org` failed with `EAI_AGAIN`, so `npm install` was not possible. Server/Three.js Vite runtime, app typecheck and two-browser multiplayer scenarios have **not run**. Static screenshot cannot certify functionality. To proceed, install dependencies on a networked machine; run `npm test`, `npm run typecheck`, `npm run build`, and `npm run test:e2e`; fix any issues, then attach Playwright trace / server logs. Generate and commit `package-lock.json`, change CI `npm install` → `npm ci`, then close T01. Do not begin art proof until at least two independent clients have a verified shared room and movement.
+**Verified GitHub runner:** Ubuntu/Node 22, locked `npm ci`, 6 contract test groups, `npm run typecheck`, `npm run build`, and Chromium Playwright `npm run test:e2e` — **8/8 PASS (51.6s)**. [GitHub Actions run 42023515834](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42023515834) on `87281e7`.
+
+**Covered runtime scenarios:** M01 create/join and server-controlled position visible in a separate browser context; M03 reconnection via real WebSocket close (same session ID); M04 45-second reconnect expiry removes disconnected player from authoritative state (seats not implemented); M05 sixth join accepted/seventh rejected and freed spot reused; M06 invalid/no token rejected and an unauthorized pre-host attempt does **not** dispose the room; M07 connected host promoted when previous host leaves while another guest is disconnected; joining after departure does not reuse occupied spawn slot. These run on **one GitHub CI runner**, not physical devices or WAN.
+
+**Remaining review gates:** independent real-device/WAN test, capacity/latency/performance on target laptop, 3–6 people playtest, stronger input-abuse/join throttling, HTTP create limiter memory bounds, terminal client cleanup UX and WebGL screenshot/visual inspection. Client/world social features, chairs/emotes/chat/photo and art proof are not implemented. PR #1 remains Draft until outstanding launch criteria are reviewed; no GPU visual PASS is claimed.
 
 ## Security caveats
 
