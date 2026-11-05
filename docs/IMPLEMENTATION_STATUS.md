@@ -12,7 +12,7 @@
 | Lobby UI | Browser `page.set_content()` with authored HTML + CSS; screenshots saved 1440px and 390px, no horizontal overflow | **STATIC UI OBSERVED** |
 | Staging deploy (ops PR #3) | Vercel static preview READY, Railway Colyseus single instance SUCCESS. GitHub Actions [remote smoke 42048418805 attempt 2](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42048418805/attempts/2) **3/3 PASS** over public HTTPS/WSS from one CI runner; real-device WAN test still outstanding | **STAGING E2E VERIFIED (REMOTE CI)** |
 | Desktop session stability (PR #4) | Shared cleanup for terminal `onLeave` and voluntary leave, stale-session callback guard and owned-material disposal. Real Chromium tests verify exit→rejoin and terminal WebSocket close→lobby→new room; existing temporary SDK reconnect remains green. [CI 42068283706](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42068283706) **12/12 PASS** | **CI + REMOTE STAGING VERIFIED (SCOPED)** |
-| T04 polished lakeside art proof | Placeholder only; no GPU camera/lighting/photo review | **NOT STARTED** |
+| T04-A1 lakefront terrain greybox (new PR) | Original Three.js 40m path, curved bank, muted water/ripples and stone edge; real canvas screenshot capture test written; **CI, visual and GPU QA pending** | **CODED / QA PENDING** |
 | T05+ social actions | None | **NOT STARTED** |
 
 ## Verified local commands
@@ -44,3 +44,5 @@ Node.js `v22.16.0`, TypeScript globally installed, Python 3.13.5, Chromium avail
 **PR #4 review addendum:** Added WebGL initialization failure browser scenario on 2026-11-05. Previous CI 42068283706 proves 12/12 lifecycle/room tests on commit 2d27925; the new scenario requires a fresh CI run before being called PASS.
 
 **PR #4 staging update (2026-11-05):** [GitHub CI 42069923384](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42069923384) 13/13 real Chromium/Colyseus E2E incl. WebGL failure; [remote smoke 42070614219](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42070614219) 5/5 PASS through **new dedicated Vercel PR4 preview URL** and existing Railway staging backend. Tested leave→rejoin and terminal WebSocket→lobby across public HTTPS/WSS from one cloud runner. Previous staging branch URL remains on PR3; mobile and two physical networks remain untested.
+
+**D2-A1 scope boundary:** Original procedurally authored geometry and materials; no photographs, third-party textures or geographically precise layout claims. Water starts outside the server-authoritative x/z ±22 m walking bounds. No new server physics/collision, no mature hero pine yet, no D2-A art acceptance or physical GPU test. After first screenshot review: add hero pine and far shore in a subsequent scoped change.
