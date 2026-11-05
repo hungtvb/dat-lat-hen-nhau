@@ -25,6 +25,11 @@ test('D2-A1 SHOT-01 draws real lakeside canvas at two desktop sizes',async ({pag
   });
   expect(metrics.width).toBeGreaterThanOrEqual(1440);
   expect(metrics.height).toBeGreaterThanOrEqual(900);
+  // Capture the real experience WITH HUD before isolating scenery for art review.
+  mkdirSync('artifacts/scenic',{recursive:true});
+  writeFileSync('artifacts/scenic/D2A1-SHOT01-1440x900-HUD.png',await page.screenshot());
+  await page.addStyleTag({content:'.world-topbar,.world-sidebar,.world-bottom{visibility:hidden!important}'});
+  await page.waitForTimeout(120);
   const large=await canvas.screenshot();
   expect(large.byteLength).toBeGreaterThan(10000);
   await testInfo.attach('D2A1-SHOT01-canvas-1440x900.png',{body:large,contentType:'image/png'});
