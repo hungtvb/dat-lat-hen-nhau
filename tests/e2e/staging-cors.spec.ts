@@ -15,8 +15,11 @@ test('room creation preflight accepts only the configured frontend origin', asyn
   const denied = await request.fetch(API, {
     method:'OPTIONS', headers:{Origin:BLOCKED,'Access-Control-Request-Method':'POST'}
   });
-  expect(denied.status()).toBe(403);
-  expect(denied.headers()['access-control-allow-origin']).toBeUndefined();
+  // Colyseus answers OPTIONS at the transport layer with 204 before Express.
+  // Security property: browser must NOT see an allowed origin.
+  expect([204,403]).toContain(denied.status());
+  expect(denied.headers()['access-control-allow-origin'] ?? '').not.toBe(BLOCKED);
+  expect(denied.headers()['access-control-allow-origin'] ?? '').not.toBe('*');
 });
 
 test('room creation HTTP endpoint blocks untrusted browser origins', async ({request}) => {

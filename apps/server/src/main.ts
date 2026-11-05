@@ -5,7 +5,8 @@ import {newInviteToken} from "./security.js";
 
 const port = Number(process.env.PORT || 2567);
 const createHits = new Map<string, number[]>();
-const MAX_ROOM_CREATES_PER_5_MIN = 8;
+const rateLimit = Number(process.env.MAX_ROOM_CREATES_PER_5_MIN ?? 8);
+const MAX_ROOM_CREATES_PER_5_MIN = Number.isSafeInteger(rateLimit) && rateLimit >= 1 && rateLimit <= 100 ? rateLimit : 8;
 // The explicit frontend allowlist is required for browser requests from Vercel.
 // In development, two Vite origins are allowed; deployment sets ALLOWED_ORIGINS.
 const allowedOrigins = new Set(
@@ -66,6 +67,16 @@ const server = defineServer({
     });
   }
 });
+// Colyseus intercepts OPTIONS before Express. Override its matchmaking CORS
+// response as well as our explicit /api/rooms POST origin guard.
+// Disallowed origins receive no usable Access-Control-Allow-Origin value.
+matchMaker.controller.getCorsHeaders = (req) => {
+  const origin = req.headers.origin;
+  return {
+    "Access-Control-Allow-Origin": origin && allowedOrigins.has(origin) ? origin : "",
+    "Vary": "Origin"
+  };
+};
 // For invite-only rooms clients must not create arbitrary public rooms via matchmaking.
 matchMaker.controller.exposedMethods = ["joinById", "reconnect"];
 await server.listen(port);
