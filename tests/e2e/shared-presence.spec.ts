@@ -46,6 +46,18 @@ test('an invalid invite token cannot enter an existing room', async ({browser}) 
 test('temporary network drop reconnects with the same avatar identity', async ({browser}) => {
   const contextA=await browser.newContext();
   const contextB=await browser.newContext();
+  // Observe the real WebSocket used by the client without mocking Colyseus messages.
+  await contextB.addInitScript(() => {
+    const NativeSocket=window.WebSocket;
+    const sockets: WebSocket[]=[];
+    (window as any).__DALAT_TEST_SOCKETS__=sockets;
+    window.WebSocket=class extends NativeSocket {
+      constructor(url:string|URL, protocols?:string|string[]) {
+        super(url, protocols);
+        sockets.push(this);
+      }
+    } as typeof WebSocket;
+  });
   try {
     const a=await contextA.newPage();
     const b=await contextB.newPage();
@@ -67,11 +79,17 @@ test('temporary network drop reconnects with the same avatar identity', async ({
     const connectionMark=a.locator('#player-list .player-row').filter({hasText:'Nắng Sớm'}).locator('.player-connection');
     await expect(connectionMark).toHaveText('●');
 
-    // The Colyseus 0.17 automatic-reconnect path has a minimum connected-uptime guard.
+    // The SDK has a minimum uptime before automatic reconnect is enabled.
+    // Chromium's setOffline() does not necessarily close existing WebSockets,
+    // so explicitly end the actual browser transport with a non-consented code.
     await b.waitForTimeout(2500);
-    await contextB.setOffline(true);
+    await b.evaluate(() => {
+      const sockets=(window as any).__DALAT_TEST_SOCKETS__ as WebSocket[];
+      const active=sockets.findLast(socket => socket.readyState === WebSocket.OPEN);
+      if (!active) throw new Error('No active Colyseus WebSocket to interrupt');
+      active.close(4102, 'Temporary transport failure (E2E)');
+    });
     await expect(connectionMark).toHaveText('○', {timeout: 12000});
-    await contextB.setOffline(false);
     await expect(connectionMark).toHaveText('●', {timeout: 25000});
 
     await expect.poll(async () => a.evaluate(() => {
