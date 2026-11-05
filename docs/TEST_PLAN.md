@@ -95,3 +95,9 @@ Chạy với 3–6 người, 15–20 phút. Gửi một link mời và không gi
 - **WebGL unavailable test added:** deliberately reject canvas WebGL context in an isolated Chromium context **after** actual room creation/join. Require clear error, release of client renderer, return to lobby and clean invite URL. Status is **NOT YET VERIFIED** until the PR's updated CI completes.
 
 - **Live deployment regression:** [run 42070614219](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42070614219), 5/5 PASS (13.2 seconds), verifies real public backend health/CORS, two browsers join+move, session exit/rejoin and terminal close→lobby on PR4 preview. This runs on one CI runner, not two physical WAN clients. [Local run 42069923384](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42069923384) 13/13 PASS including WebGL initialization rejection.
+
+## D2-A1 first scenic frame — proposed QA
+
+- New `tests/e2e/scenic-shot01.spec.ts` starts a real Colyseus guest in Chromium, verifies the real Three.js canvas, and attaches 1440×900 and 1280×720 **canvas screenshots** with WebGL renderer metadata. The screenshot file must be opened and reviewed by a person; its existence is not visual-quality PASS.
+- Existing multiplayer, reconnect and CORS E2E must remain green. No server movement bounds were changed; shoreline water geometry is outside x=-22m walkable boundary.
+- Visual review checklist: bank has no seam / floating grass, water does not resemble a small circle, path is continuous, 2–6 avatar positions remain visible. The hero pine, real GPU FPS, collision/camera sweep, and two physical machines are still NOT VERIFIED.

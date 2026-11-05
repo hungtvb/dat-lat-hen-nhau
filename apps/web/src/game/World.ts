@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import type {AvatarVariant} from "@dalat/shared";
 import type {SyncedPlayer} from "../network/rooms";
+import {buildLakesideGreybox} from "./scenery/LakesideScenery";
 
 const VARIANT_COLORS: Record<AvatarVariant, number> = {berry:0xa64f58, forest:0x4b7063, sand:0xc4a984, sky:0x63879b};
 
@@ -32,22 +33,14 @@ function labelTexture(name:string):THREE.CanvasTexture {
   return new THREE.CanvasTexture(canvas);
 }
 
-function makePine(scene:THREE.Scene,x:number,z:number,height:number) {
-  const group = new THREE.Group();group.position.set(x,0,z);
-  const bark=new THREE.Mesh(new THREE.CylinderGeometry(.11,.17,height*.57,7),new THREE.MeshStandardMaterial({color:0x78644c,roughness:1}));bark.position.y=height*.29;group.add(bark);
-  const green=new THREE.MeshStandardMaterial({color:0x345d52,roughness:1});
-  for(let j=0;j<3;j++) {const crown=new THREE.Mesh(new THREE.ConeGeometry(.7 +j*.19,height*.55,8),green);crown.position.y=height*.65 + (.48-j*.17);group.add(crown);}
-  scene.add(group);
-}
-
-/** Neutral art-spike world. Not the approved final Xuân Hương visual proof. */
+/** D2-A1 terrain greybox awaiting real-engine art review. */
 export class World {
   readonly renderer:THREE.WebGLRenderer;
   private readonly scene = new THREE.Scene();
-  private readonly camera = new THREE.PerspectiveCamera(56,1,.1,160);
+  private readonly camera = new THREE.PerspectiveCamera(56,1,.1,210);
   private readonly avatars=new Map<string,AvatarVisual>();
   private readonly keys=new Set<string>();
-  private selfId='';private stopped=false;private raf=0;private yaw=0;
+  private selfId='';private stopped=false;private raf=0;private yaw=.9;
   private width=1;private height=1;
   private dragFromX: number|null=null;
   private resizeObserver:ResizeObserver;
@@ -57,15 +50,14 @@ export class World {
     this.renderer.shadowMap.enabled=false;
     this.renderer.outputColorSpace=THREE.SRGBColorSpace;
     this.container.appendChild(this.renderer.domElement);
-    this.scene.background=new THREE.Color(0xa5c9c3);
-    this.scene.fog=new THREE.Fog(0xa5c9c3,33,82);
-    this.scene.add(new THREE.HemisphereLight(0xece6cf,0x5f7562,2.5));
-    const light=new THREE.DirectionalLight(0xffe6b4,2.2);light.position.set(-10,22,12);this.scene.add(light);
-    const ground=new THREE.Mesh(new THREE.PlaneGeometry(120,120),new THREE.MeshStandardMaterial({color:0x69877a,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=-.03;this.scene.add(ground);
-    const path=new THREE.Mesh(new THREE.PlaneGeometry(11,45),new THREE.MeshStandardMaterial({color:0xc0b6a0,roughness:1}));path.rotation.x=-Math.PI/2;path.position.set(0,0.006,0);this.scene.add(path);
-    const lake=new THREE.Mesh(new THREE.CircleGeometry(22,64),new THREE.MeshStandardMaterial({color:0x5e9aa1,metalness:.1,roughness:.38}));lake.rotation.x=-Math.PI/2;lake.position.set(-34,0.01,-1);lake.scale.y=1.5;this.scene.add(lake);
-    for(let i=0;i<19;i++){const x=i%2===0?8+(i%3)*1.8:-9-(i%3)*1.5;const z=-21+i*2.2;makePine(this.scene,x,z,4+(i%4)*1.3)}
-    this.camera.position.set(10,8,13);this.camera.lookAt(0,1,0);
+    this.scene.background=new THREE.Color(0xb7cec6);
+    this.scene.fog=new THREE.Fog(0xb7cec6,48,162);
+    this.scene.add(new THREE.HemisphereLight(0xffead3,0x607c74,2.15));
+    const light=new THREE.DirectionalLight(0xffddb3,1.9);
+    light.position.set(-17,24,9);this.scene.add(light);
+    buildLakesideGreybox(this.scene);
+    this.renderer.domElement.dataset.scene='D2A1-SHOT01';
+    this.camera.position.set(7.6,3.35,7);this.camera.lookAt(0,1.3,0);
     this.resizeObserver=new ResizeObserver(()=>this.resize());this.resizeObserver.observe(container);this.resize();
     window.addEventListener('keydown',this.onKeyDown);window.addEventListener('keyup',this.onKeyUp);window.addEventListener('blur',this.clearKeys);
     this.renderer.domElement.addEventListener('pointerdown',this.onPointerDown);window.addEventListener('pointermove',this.onPointerMove);window.addEventListener('pointerup',this.onPointerUp);
@@ -110,7 +102,7 @@ export class World {
     if(this.stopped)return;
     this.avatars.forEach(a=>a.group.position.lerp(a.target,.18));
     const self=this.avatars.get(this.selfId);
-    if(self){const p=self.group.position;const offset=new THREE.Vector3(Math.sin(this.yaw)*8,5.8,Math.cos(this.yaw)*8.4);const pos=p.clone().add(offset);this.camera.position.lerp(pos,.075);this.camera.lookAt(p.x,p.y+1.3,p.z);}
+    if(self){const p=self.group.position;const offset=new THREE.Vector3(Math.sin(this.yaw)*9.6,3.35,Math.cos(this.yaw)*9.6);const pos=p.clone().add(offset);this.camera.position.lerp(pos,.075);this.camera.lookAt(p.x,p.y+1.3,p.z);}
     this.renderer.render(this.scene,this.camera);
     this.raf=requestAnimationFrame(this.update);
   };

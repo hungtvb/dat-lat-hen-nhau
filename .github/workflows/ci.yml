@@ -35,5 +35,6 @@ jobs:
           path: |
             test-results/
             playwright-report/
+            artifacts/scenic/
           if-no-files-found: ignore
           retention-days: 7
