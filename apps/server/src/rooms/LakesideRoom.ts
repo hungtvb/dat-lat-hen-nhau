@@ -9,6 +9,10 @@ import {tokenDigest, verifyInvite} from "../security.js";
 
 /** Room is server-owned. Invite grants access but is not exposed as metadata. */
 export class LakesideRoom extends Room<{state: LakesideState}> {
+  // Before the first valid guest joins, preserve the empty invite room until the
+  // existing 120-second creation timeout. An unauthorized reservation must not
+  // dispose the room before its legitimate creator can enter.
+  autoDispose = false;
   maxClients = MAX_PLAYERS;
   patchRate = SIM_TICK_MS;
   state = new LakesideState();
@@ -53,6 +57,8 @@ export class LakesideRoom extends Room<{state: LakesideState}> {
     player.z = 1 + Math.floor(ordinal / 3) * 2.4;
     this.state.players.set(client.sessionId, player);
     this.joinOrder.push(client.sessionId);
+    // Once occupied, the normal Colyseus empty-room disposal policy resumes.
+    this.autoDispose = true;
     if (!this.state.hostPlayerId) this.state.hostPlayerId = client.sessionId;
   }
 
