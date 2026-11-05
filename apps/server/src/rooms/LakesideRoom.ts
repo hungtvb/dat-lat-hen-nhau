@@ -19,6 +19,8 @@ export class LakesideRoom extends Room<{state: LakesideState}> {
   private inviteHash!: Buffer;
   private inputs = new Map<string, {input: MoveInput; lastAt: number}>();
   private joinOrder: string[] = [];
+  // A reconnecting guest retains their reserved spawn slot until onLeave().
+  private spawnSlots = new Map<string, number>();
 
   onCreate(options: {invite: string}) {
     if (typeof options.invite !== "string" || !options.invite) throw new Error("Invite token required to create room");
@@ -52,10 +54,15 @@ export class LakesideRoom extends Room<{state: LakesideState}> {
     const player = new PlayerState();
     player.name = normalizeGuestName(options.name)!;
     player.variant = parseVariant(options.variant)!;
-    const ordinal = this.joinOrder.length;
+    // Never derive spawn slot from current player count: after departures that
+    // index may still belong to an existing guest, causing two avatars to overlap.
+    const occupiedSlots = new Set(this.spawnSlots.values());
+    const ordinal = Array.from({length: MAX_PLAYERS}, (_, i) => i).find(i => !occupiedSlots.has(i));
+    if (ordinal === undefined) throw new ServerError(429, "Phòng đã đủ 6 người");
     player.x = -2.4 + (ordinal % 3) * 2.4;
     player.z = 1 + Math.floor(ordinal / 3) * 2.4;
     this.state.players.set(client.sessionId, player);
+    this.spawnSlots.set(client.sessionId, ordinal);
     this.joinOrder.push(client.sessionId);
     // Once occupied, the normal Colyseus empty-room disposal policy resumes.
     this.autoDispose = true;
@@ -72,15 +79,22 @@ export class LakesideRoom extends Room<{state: LakesideState}> {
 
   onReconnect(client: Client) {
     const player = this.state.players.get(client.sessionId);
-    if (player) player.connected = true;
+    if (player) {
+      player.connected = true;
+      // If every other guest was offline when the former host left, recover the
+      // host role when the first reserved session actually reconnects.
+      if (!this.state.hostPlayerId) this.state.hostPlayerId = client.sessionId;
+    }
   }
 
   onLeave(client: Client) {
     this.inputs.delete(client.sessionId);
     this.state.players.delete(client.sessionId);
+    this.spawnSlots.delete(client.sessionId);
     this.joinOrder = this.joinOrder.filter(id => id !== client.sessionId);
     if (this.state.hostPlayerId === client.sessionId) {
-      this.state.hostPlayerId = this.joinOrder[0] ?? "";
+      // Disconnected guests reserve identity, not host authority.
+      this.state.hostPlayerId = this.joinOrder.find(id => this.state.players.get(id)?.connected) ?? "";
     }
   }
 
