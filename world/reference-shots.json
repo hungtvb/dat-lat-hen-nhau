@@ -1,0 +1,116 @@
+{
+  "schema_version": "0.1-reference-study",
+  "status": "design_only_not_rendered",
+  "game": "Da Lat Hen Nhau",
+  "scene_id": "xuan-huong-lakeside-v1",
+  "document": "docs/ART_REFERENCE_XUAN_HUONG.md",
+  "coordinate_authority": "artistic local coordinates; no confirmed GIS coordinates or calibrated photo cameras",
+  "evidence_source_ids": [
+    "R01",
+    "R02",
+    "R03",
+    "R04",
+    "R05",
+    "R06",
+    "R07",
+    "R08"
+  ],
+  "source_policy": "Use original modelling; reference image links are not bundled textures and reuse rights must be audited per asset.",
+  "shots": [
+    {
+      "id": "SHOT-01",
+      "name": "Diem hen duoi tan thong",
+      "type": "hero",
+      "camera_location_status": "to_be_calibrated",
+      "reference_ids": [
+        "R01",
+        "R02",
+        "R04"
+      ],
+      "requires": [
+        "asymmetric mature pine boughs framing upper image",
+        "continuous sloped shore with grass and natural water edge",
+        "visible 2-6 avatars on stable walkway",
+        "calm lake and distant urban treeline",
+        "close-up avatars remain discernible with fog"
+      ],
+      "disallowed": [
+        "spruce-like repeated cone crowns as primary tree",
+        "one disk-like lake with sharp uniform edge",
+        "avatars clipped into shoreline"
+      ],
+      "proof": "in_engine_16_9_screenshot_plus_reference_comparison"
+    },
+    {
+      "id": "SHOT-02",
+      "name": "Con duong ven ho",
+      "type": "walk_and_pause",
+      "camera_location_status": "to_be_calibrated",
+      "reference_ids": [
+        "R01",
+        "R03",
+        "R08"
+      ],
+      "requires": [
+        "curved connected path",
+        "bench relative size matches players",
+        "side of path to water is physically clear",
+        "two distinct hero pine silhouettes",
+        "camera clearance through bends"
+      ],
+      "disallowed": [
+        "arbitrary floating paths",
+        "trees obscuring camera/entire route"
+      ],
+      "proof": "in_engine_walkthrough_and_still_screenshot"
+    },
+    {
+      "id": "SHOT-03",
+      "name": "Nhin ve quang truong",
+      "type": "landmark",
+      "camera_location_status": "to_be_calibrated_and_verified_for_visibility",
+      "reference_ids": [
+        "R03",
+        "R04",
+        "R05",
+        "R07"
+      ],
+      "requires": [
+        "water foreground",
+        "verified street/shore separation",
+        "recognisable Lam Vien botanical glass building shapes when source-aligned",
+        "credible lake and distant city scale"
+      ],
+      "disallowed": [
+        "square placed directly on grass at lake edge",
+        "incorrect single uniform dome as landmark",
+        "declaring geographic accuracy without camera evidence"
+      ],
+      "proof": "source_aligned_daylight_screenshot_plus_viewpoint_note"
+    }
+  ],
+  "lighting_modes": [
+    "morning-mist",
+    "clear-afternoon",
+    "purple-dusk"
+  ],
+  "production_sequence": [
+    "photo viewpoint validation",
+    "graybox shoreline/landform/path",
+    "hero pine silhouette",
+    "lake water materials",
+    "distant plaza architecture",
+    "in-engine visual QA"
+  ],
+  "dependencies": [
+    "PR #1 CI typecheck/build pass",
+    "two-browser multiplayer E2E",
+    "WebGL screenshot acceptance before main art expansion"
+  ],
+  "source_3dviz_records": [
+    "knowledge.blueprint-tree-conifer",
+    "knowledge.terrain-landmark-rhythm",
+    "knowledge.navigable-density-rest-areas",
+    "references/lighting-direction-and-scale.md"
+  ]
+}
