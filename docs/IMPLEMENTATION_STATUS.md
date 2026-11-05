@@ -1,14 +1,14 @@
 # Implementation Status — 2026-11-05
 
-**Scope:** T01 bootstrap + typed contracts and staged T02/T03 Colyseus + Three.js network vertical slice. This local artifact was made after the GDD/architecture review. Repository `hungtvb/dat-lat-hen-nhau` is now initialized. Application source is committed on `feat/multiplayer-foundation` for a draft PR; this does not prove runtime multiplayer works.
+**Scope:** T01 bootstrap + typed contracts and staged T02/T03 Colyseus + Three.js network vertical slice. Repository `hungtvb/dat-lat-hen-nhau` has an active draft foundation PR. GitHub Actions has now executed real Colyseus + Chromium tests against the server/client; this is evidence for the network slice, **not** a finished game or multi-device WAN release.
 
 | Work item | Current evidence | Status |
 |---|---|---|
-| T01 monorepo, typed shared contracts | `package.json` workspaces; `packages/shared` compiled with global TypeScript compiler; 6 domain test groups passed | **PARTIAL VERIFIED** |
-| T01 CI workflow | GitHub Actions run `41987904294` on `52f49fd`: dependency install, 6 contract tests, TypeScript typecheck, and client/server build all passed; lockfile still missing | **CI VERIFIED / LOCKFILE PENDING** |
-| T02 private room + invite gate | `apps/server/src/main.ts`, `LakesideRoom.ts`, token digest and validation | **CODED / NOT RUN** |
-| T03 server-authoritative movement | `moveInput` validation; 20Hz simulation loop, 2.2m/s clamp and replay sequence guard | **CODED / NOT RUN** |
-| T03 client presence / avatar | `apps/web/src/network` + `apps/web/src/game/World.ts` | **CODED / NOT RUN** |
+| T01 monorepo, typed shared contracts | `package.json` workspaces, tracked `package-lock.json`, 6 contract-test groups in GitHub CI | **CI VERIFIED** |
+| T01 CI workflow | `npm ci`, contract tests, server/web typecheck, build and Playwright E2E passed in [workflow 41998367589](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/41998367589) (`f72a3afd`) | **CI VERIFIED** |
+| T02 private room + invite gate | Real create + join-by-invite with two isolated browser contexts; invalid invite rejected; room full/expiry/direct-ID cases not yet E2E | **PARTIAL E2E VERIFIED** |
+| T03 server-authoritative movement | Remote avatar position changed in Playwright two-client E2E; speed/replay controls covered only in shared contract tests | **PARTIAL E2E VERIFIED** |
+| T03 client presence / avatar | Two clients observe roster and remote presence; test drops real WebSocket using Colyseus code 4010 after SDK 5s minUptime, then verifies same session ID returns | **E2E VERIFIED (BASIC RECONNECT)** |
 | Lobby UI | Browser `page.set_content()` with authored HTML + CSS; screenshots saved 1440px and 390px, no horizontal overflow | **STATIC UI OBSERVED** |
 | T04 polished lakeside art proof | Placeholder only; no GPU camera/lighting/photo review | **NOT STARTED** |
 | T05+ social actions | None | **NOT STARTED** |
@@ -25,7 +25,9 @@ Node.js `v22.16.0`, TypeScript globally installed, Python 3.13.5, Chromium avail
 
 ## Blocking conditions and next gate
 
-Local network DNS failed with `EAI_AGAIN`, so dependencies could not be installed locally. **GitHub CI verified** `npm install`, `npm test`, `npm run typecheck` and `npm run build` on `52f49fd` (workflow run `41987904294`, success). **Still NOT RUN:** actual Colyseus join/reconnect, GPU WebGL rendering, and Playwright two-browser multiplayer scenarios. Static screenshot and successful build do not certify multiplayer functionality. Next: execute `npm run test:e2e` against real server and two isolated browser contexts; capture trace/server logs, fix failures, then generate and commit `package-lock.json` and switch CI `npm install` → `npm ci`. Keep PR Draft until those acceptance gates pass; do not begin polished art proof before verified shared room and movement.
+**Verified GitHub runner:** Ubuntu, Node 22, `npm ci --no-audit --no-fund`, `npm test` (six groups), `npm run typecheck`, `npm run build`, Chromium Playwright `npm run test:e2e` (3/3 PASS, 19.4s). Evidence: [workflow 41998367589](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/41998367589). Scenarios: M01 two isolated browser contexts with join + synchronized movement, M06 invalid invite token, and M03 subset abnormal WebSocket close/reconnect with same avatar/session ID. For M03 this **does not** prove a 10–20 second physical network outage or full seat reservation (seats not implemented).
+
+**Remaining gates:** Real two-device/WAN connections, 6-person capacity, disconnect beyond reservation time, host handoff, full invite edge cases, real WebGL screenshots/visual inspection and FPS QA. CI can construct Three.js canvas in headless Chromium but this is **not** visual-quality proof. Foundation stays Draft until acceptance/review; do not conflate the placeholder lake with the polished scenic slice. Local environment npm registry DNS remains unavailable, so full app was executed on GitHub runner, not locally here.
 
 ## Security caveats
 

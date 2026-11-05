@@ -1,6 +1,6 @@
 # QA / Acceptance Test Plan — Đà Lạt Hẹn Nhau
 
-**Status:** Test specifications only. Chưa có multiplayer implementation; **tất cả outcome là NOT RUN**. Test trước thuộc game offline `Đà Lạt Trong Mơ` **không chứng minh** các tiêu chí này.
+**Status:** Mixed test plan and actual CI evidence as of 2026-11-05. Three Playwright E2E scenarios passed on GitHub Actions ([run 41998367589](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/41998367589)). Unlisted scenarios remain **NOT RUN**. The prior offline prototype `Đà Lạt Trong Mơ` does not count as multiplayer evidence.
 
 ## 1. Test matrix — highest priority
 
@@ -22,6 +22,16 @@
 | S06 | A opens photo mode while B moves/emotes | A can save PNG representing A's frame; B is not frozen | E2E image |
 | S07 | Player with duplicate display name joins | players remain separately identifiable; no state overwrite | E2E 2-client |
 | S08 | User clicks Help/Photo/Settings during walking | no stuck input, escape route works; focus returns correctly | E2E UX |
+
+## Verified network subset (2026-11-05)
+
+| Scenario | Actual test evidence | Boundary |
+|---|---|---|
+| M01 partial | A creates room, B joins using invite, both rosters show 2/6, B sees A's server-controlled movement | Same CI runner with **two separate browser contexts**, not two physical devices |
+| M03 partial | B's real WebSocket closes with Colyseus `MAY_TRY_RECONNECT` (4010) after SDK `minUptime=5000ms`; A sees disconnected/connected and same session ID after recovery | Not a physical 10–20s outage; no seats implemented |
+| M06 partial | Invalid invite token is rejected and host roster remains 1/6 | Expired token and direct room-ID attempts not yet covered |
+
+Other network and social test rows are **NOT RUN** or not yet implemented. Full visual QA V01–V08 is **NOT RUN**. Passing headless Chromium browser integration is not equivalent to GPU screenshot review or a WAN group playtest.
 
 ## 2. Visual test matrix, actual render evidence required
 
@@ -60,7 +70,7 @@
 | PROPOSED | Chỉ có requirement/plan |
 | CODED | Có code nhưng chưa chạy |
 | AUTOMATED TEST PASS | Có command, environment, log pass |
-| E2E OBSERVED | Hai trình duyệt với network thật đã xem tương tác |
+| E2E OBSERVED | Real client/server interactions verified in independent browser contexts; report device/network constraints separately |
 | GPU VISUALLY INSPECTED | Screenshot/video thực từ renderer WebGL trên thiết bị được xác định |
 | PLAYER VALIDATED | Nhóm người chơi đã xác nhận cảm giác đi cùng nhau |
 
