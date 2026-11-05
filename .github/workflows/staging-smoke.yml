@@ -1,7 +1,7 @@
 name: Live staging HTTPS/WSS smoke
 on:
   push:
-    branches: [ops/staging-deploy]
+    branches: [ops/staging-deploy, fix/desktop-session-stability]
   workflow_dispatch:
 permissions:
   contents: read
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      STAGING_WEB_ORIGIN: https://dat-lat-hen-nhau-preview-git-ops-stagi-636dc7-hungtvbs-projects.vercel.app
+      STAGING_WEB_ORIGIN: ${{ github.ref_name == 'fix/desktop-session-stability' && 'https://dat-lat-hen-nhau-preview-git-fix-deskt-3b72a2-hungtvbs-projects.vercel.app' || 'https://dat-lat-hen-nhau-preview-git-ops-stagi-636dc7-hungtvbs-projects.vercel.app' }}
       STAGING_API_ORIGIN: https://dalat-colyseus-staging.up.railway.app
     steps:
       - uses: actions/checkout@v4
