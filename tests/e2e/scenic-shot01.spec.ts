@@ -1,3 +1,4 @@
+import {mkdirSync,writeFileSync} from 'node:fs';
 import {test,expect} from '@playwright/test';
 
 /** Real Colyseus room + WebGL frames from GitHub CI Chromium.
@@ -28,10 +29,17 @@ test('D2-A1 SHOT-01 draws real lakeside canvas at two desktop sizes',async ({pag
   expect(large.byteLength).toBeGreaterThan(10000);
   await testInfo.attach('D2A1-SHOT01-canvas-1440x900.png',{body:large,contentType:'image/png'});
   await testInfo.attach('D2A1-renderer.json',{body:JSON.stringify(metrics,null,2),contentType:'application/json'});
+  // Playwright attachments may be cleaned on passing tests. Persist review
+  // frames in a dedicated CI directory that upload-artifact always reads.
+  mkdirSync('artifacts/scenic',{recursive:true});
+  writeFileSync('artifacts/scenic/D2A1-SHOT01-1440x900.png',large);
+  writeFileSync('artifacts/scenic/D2A1-renderer.json',JSON.stringify(metrics,null,2));
+
   await page.setViewportSize({width:1280,height:720});
   await page.waitForTimeout(150);
   const small=await canvas.screenshot();
   expect(small.byteLength).toBeGreaterThan(10000);
   await testInfo.attach('D2A1-SHOT01-canvas-1280x720.png',{body:small,contentType:'image/png'});
+  writeFileSync('artifacts/scenic/D2A1-SHOT01-1280x720.png',small);
   expect(errors).toEqual([]);
 });
