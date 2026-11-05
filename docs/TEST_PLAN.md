@@ -84,10 +84,12 @@
 
 Chạy với 3–6 người, 15–20 phút. Gửi một link mời và không giao nhiệm vụ. Quan sát: họ có nhìn thấy nhau không; tự tìm được chỗ ngồi không; có dừng ngắm cảnh không; ảnh chung có dễ chụp không; có thấy muốn quay lại không. Cuối buổi hỏi 3 câu mở: “Cảnh nào em thích nhất?”, “Lúc nào thấy thực sự đi cùng nhóm?”, “Điều gì làm em mất cảm giác Đà Lạt?”. Không dùng XP/quest để ép họ đi qua khu vực.
 
-## Desktop stability regression (implementation pending verification)
+## Desktop stability regression (scoped CI verified; WebGL failure scenario added)
 
 - **Voluntary leave:** return to lobby, remove renderer canvas, clear invite URL fragment, allow a brand-new private room in the same tab.
 - **Terminal WebSocket leave:** same cleanup and visible error; no stuck world or old session callback mutation. Do **not** treat SDK's temporary onDrop as terminal (existing reconnect test must remain green).
 - **WebGL startup failure after room join:** leave backend session and return lobby with actionable fallback, rather than continuing to send input with no renderer.
 - **Memory:** dispose per-avatar owned materials when avatars leave; avoid leaking materials across repeated sessions.
 - **Evidence:** [GitHub Actions 42068283706](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42068283706) passes locked install, contract tests, typecheck, build and **12/12 real Colyseus/Chromium E2E** (51.5s), including two new browser lifecycle scenarios and existing temporary-reconnection regression. This uses isolated contexts on one runner; no independent WAN device testing. Device-specific GPU and WAN tests remain outstanding.
+
+- **WebGL unavailable test added:** deliberately reject canvas WebGL context in an isolated Chromium context **after** actual room creation/join. Require clear error, release of client renderer, return to lobby and clean invite URL. Status is **NOT YET VERIFIED** until the PR's updated CI completes.

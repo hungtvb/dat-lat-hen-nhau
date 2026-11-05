@@ -11,7 +11,7 @@
 | T03 client presence / avatar | Two-client roster/reconnect identity; **45s timeout cleans ghost avatar**; no reused spawn slot; host handoff skips disconnected guest | **E2E VERIFIED (SCOPED)** |
 | Lobby UI | Browser `page.set_content()` with authored HTML + CSS; screenshots saved 1440px and 390px, no horizontal overflow | **STATIC UI OBSERVED** |
 | Staging deploy (ops PR #3) | Vercel static preview READY, Railway Colyseus single instance SUCCESS. GitHub Actions [remote smoke 42048418805 attempt 2](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42048418805/attempts/2) **3/3 PASS** over public HTTPS/WSS from one CI runner; real-device WAN test still outstanding | **STAGING E2E VERIFIED (REMOTE CI)** |
-| Desktop session stability (PR pending) | Shared cleanup for terminal `onLeave` and voluntary leave, stale-session callback guard and owned-material disposal. Real Chromium tests verify exit→rejoin and terminal WebSocket close→lobby→new room; existing temporary SDK reconnect remains green. [CI 42068283706](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42068283706) **12/12 PASS** | **CI VERIFIED (SCOPED)** |
+| Desktop session stability (PR #4) | Shared cleanup for terminal `onLeave` and voluntary leave, stale-session callback guard and owned-material disposal. Real Chromium tests verify exit→rejoin and terminal WebSocket close→lobby→new room; existing temporary SDK reconnect remains green. [CI 42068283706](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42068283706) **12/12 PASS** | **CI VERIFIED (SCOPED)** |
 | T04 polished lakeside art proof | Placeholder only; no GPU camera/lighting/photo review | **NOT STARTED** |
 | T05+ social actions | None | **NOT STARTED** |
 
@@ -40,3 +40,5 @@ Node.js `v22.16.0`, TypeScript globally installed, Python 3.13.5, Chromium avail
 - Creation rate limit is currently an in-memory per-process development safeguard; production still needs reverse-proxy/application-layer abuse limits.
 - No login, persistent store, voice chat, photo upload, or personal analytics.
 - No external assets or geographic claims incorporated into runtime; current world is symbolic geometry.
+
+**PR #4 review addendum:** Added WebGL initialization failure browser scenario on 2026-11-05. Previous CI 42068283706 proves 12/12 lifecycle/room tests on commit 2d27925; the new scenario requires a fresh CI run before being called PASS.

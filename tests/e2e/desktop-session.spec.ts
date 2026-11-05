@@ -60,3 +60,28 @@ test('terminal websocket close returns the player to a usable lobby',async ({bro
     await expect(page.locator('#viewport canvas')).toHaveCount(1);
   }finally{await context.close();}
 });
+
+test('WebGL initialization failure releases the joined room and shows a retry path',async ({browser})=>{
+  const context=await browser.newContext();
+  await context.addInitScript(()=>{
+    const original=HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext=new Proxy(original,{
+      apply(target,thisArg,args){
+        if(['webgl2','webgl','experimental-webgl'].includes(String(args[0])))return null;
+        return Reflect.apply(target,thisArg,args);
+      }
+    });
+  });
+  try{
+    const page=await context.newPage();
+    await page.goto('/');
+    await page.locator('#nickname').fill('Không Có WebGL');
+    await page.locator('#join-button').click();
+    await expect(page.locator('#lobby')).toBeVisible({timeout:15000});
+    await expect(page.locator('#world')).toBeHidden();
+    await expect(page.locator('#join-error')).toContainText('Không thể khởi tạo WebGL');
+    await expect(page.locator('#viewport canvas')).toHaveCount(0);
+    await expect(page.locator('#join-button')).toBeEnabled();
+    await expect.poll(()=>new URL(page.url()).hash).toBe('');
+  }finally{await context.close();}
+});
