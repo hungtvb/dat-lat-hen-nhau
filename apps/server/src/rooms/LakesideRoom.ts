@@ -8,7 +8,7 @@ import {LakesideState, PlayerState} from "./State.js";
 import {tokenDigest, verifyInvite} from "../security.js";
 
 /** Room is server-owned. Invite grants access but is not exposed as metadata. */
-export class LakesideRoom extends Room<LakesideState> {
+export class LakesideRoom extends Room<{state: LakesideState}> {
   maxClients = MAX_PLAYERS;
   patchRate = SIM_TICK_MS;
   state = new LakesideState();
