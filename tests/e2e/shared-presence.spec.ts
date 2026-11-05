@@ -42,3 +42,45 @@ test('an invalid invite token cannot enter an existing room', async ({browser}) 
     await expect(a.locator('#room-status')).toContainText('1/6');
   } finally {await c1.close();await c2.close();}
 });
+
+test('temporary network drop reconnects with the same avatar identity', async ({browser}) => {
+  const contextA=await browser.newContext();
+  const contextB=await browser.newContext();
+  try {
+    const a=await contextA.newPage();
+    const b=await contextB.newPage();
+    await a.goto('/');
+    await a.locator('#nickname').fill('Mây Nhỏ');
+    await a.locator('#join-button').click();
+    await expect(a.locator('#world')).toBeVisible();
+
+    await b.goto(a.url());
+    await b.locator('#nickname').fill('Nắng Sớm');
+    await b.locator('#join-button').click();
+    await expect(b.locator('#world')).toBeVisible();
+    await expect(a.locator('#room-status')).toContainText('2/6');
+
+    const identity=await a.evaluate(() =>
+      (window as any).__DALAT_DEBUG__.players().find((p:any) => p.name === 'Nắng Sớm')?.id
+    );
+    expect(typeof identity).toBe('string');
+    const connectionMark=a.locator('#player-list .player-row').filter({hasText:'Nắng Sớm'}).locator('.player-connection');
+    await expect(connectionMark).toHaveText('●');
+
+    // The Colyseus 0.17 automatic-reconnect path has a minimum connected-uptime guard.
+    await b.waitForTimeout(2500);
+    await contextB.setOffline(true);
+    await expect(connectionMark).toHaveText('○', {timeout: 12000});
+    await contextB.setOffline(false);
+    await expect(connectionMark).toHaveText('●', {timeout: 25000});
+
+    await expect.poll(async () => a.evaluate(() => {
+      const same=(window as any).__DALAT_DEBUG__.players().filter((p:any) => p.name === 'Nắng Sớm');
+      return same.length === 1 ? same[0].id : null;
+    })).toBe(identity);
+    await expect(a.locator('#room-status')).toContainText('2/6');
+  } finally {
+    await contextA.close();
+    await contextB.close();
+  }
+});
