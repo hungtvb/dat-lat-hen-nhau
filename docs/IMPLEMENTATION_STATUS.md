@@ -10,6 +10,7 @@
 | T03 server-authoritative movement | Remote avatar position changed in Playwright two-client E2E; speed/replay controls covered only in shared contract tests | **PARTIAL E2E VERIFIED** |
 | T03 client presence / avatar | Two-client roster/reconnect identity; **45s timeout cleans ghost avatar**; no reused spawn slot; host handoff skips disconnected guest | **E2E VERIFIED (SCOPED)** |
 | Lobby UI | Browser `page.set_content()` with authored HTML + CSS; screenshots saved 1440px and 390px, no horizontal overflow | **STATIC UI OBSERVED** |
+| Staging deploy (ops PR #3) | Vercel static preview READY, Railway Colyseus single instance SUCCESS. GitHub Actions [remote smoke 42048418805 attempt 2](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42048418805/attempts/2) **3/3 PASS** over public HTTPS/WSS from one CI runner; real-device WAN test still outstanding | **STAGING E2E VERIFIED (REMOTE CI)** |
 | T04 polished lakeside art proof | Placeholder only; no GPU camera/lighting/photo review | **NOT STARTED** |
 | T05+ social actions | None | **NOT STARTED** |
 
@@ -29,7 +30,7 @@ Node.js `v22.16.0`, TypeScript globally installed, Python 3.13.5, Chromium avail
 
 **Covered runtime scenarios:** M01 create/join and server-controlled position visible in a separate browser context; M03 reconnection via real WebSocket close (same session ID); M04 45-second reconnect expiry removes disconnected player from authoritative state (seats not implemented); M05 sixth join accepted/seventh rejected and freed spot reused; M06 invalid/no token rejected and an unauthorized pre-host attempt does **not** dispose the room; M07 connected host promoted when previous host leaves while another guest is disconnected; joining after departure does not reuse occupied spawn slot. These run on **one GitHub CI runner**, not physical devices or WAN.
 
-**Remaining review gates:** independent real-device/WAN test, capacity/latency/performance on target laptop, 3–6 people playtest, stronger input-abuse/join throttling, HTTP create limiter memory bounds, terminal client cleanup UX and WebGL screenshot/visual inspection. Client/world social features, chairs/emotes/chat/photo and art proof are not implemented. PR #1 remains Draft until outstanding launch criteria are reviewed; no GPU visual PASS is claimed.
+**Remaining review gates:** Railway GitHub App permission to replace temporary pinned-clone runtime deploy, independent real-device/WAN test, capacity/latency/performance on target laptop, 3–6 people playtest, stronger input-abuse/join throttling, HTTP create limiter memory bounds, terminal client cleanup UX and WebGL screenshot/visual inspection. Client/world social features, chairs/emotes/chat/photo and art proof are not implemented. PR #1 remains Draft until outstanding launch criteria are reviewed; no GPU visual PASS is claimed.
 
 ## Security caveats
 

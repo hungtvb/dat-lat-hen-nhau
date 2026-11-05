@@ -15,12 +15,12 @@
 
 ## Before publish checklist
 
-- [ ] Review staging branch changes; GitHub Actions contract/typecheck/build/Playwright E2E green.
-- [ ] Railway staging deployment reaches SUCCESS; `GET /health` externally returns 200.
-- [ ] Set `ALLOWED_ORIGINS` on Railway and test positive and negative CORS preflight using Vercel origin.
-- [ ] Vercel preview build READY, no `localhost:2567` in the built application network requests.
-- [ ] 2 independent *remote* users join same room via HTTPS/WSS; movement sync, leave and reconnect. Distinguish browser contexts on one machine from physical devices.
-- [ ] No accidental production-branch deploy or launch; no 2nd Colyseus replica, no room token in CI logs.
+- [x] GitHub Actions 10/10 local multiplayer/CORS E2E on staging commit `f82771b`.
+- [x] Railway staging deployment SUCCESS; external `GET /health` 200 after fixing domain `targetPort` from 2567 to actual server PORT 8080.
+- [x] `ALLOWED_ORIGINS` configured for exact Vercel preview origins; external negative POST 403; room create 201 and matchmaker preflights 204/joins 200 observed from Railway edge logs.
+- [x] Vercel preview READY with public build-time `VITE_API_ORIGIN=https://dalat-colyseus-staging.up.railway.app`; remote two-browser join succeeds, proving no localhost fallback for that path.
+- [ ] Physical two-device/WAN home/mobile session, voluntary leave and prolonged reconnect still required. **Automated proof:** two independent Chromium contexts on a remote GitHub runner joined the same staging room, verified roster and moving-player WebSocket state patches via HTTPS/WSS; this is not two separate physical networks.
+- [x] No changes to `main` and no extra Colyseus replicas. Vercel **separate staging-named project** has preview deployment; automated test does not print invite tokens.
 
 ## Rollback
 
@@ -36,3 +36,13 @@ This deployment intentionally serves the **placeholder** lake/avatars, not the a
 - Vercel project `dat-lat-hen-nhau-preview`, branch alias `https://dat-lat-hen-nhau-preview-git-ops-stagi-636dc7-hungtvbs-projects.vercel.app`; public build-time `VITE_API_ORIGIN` points at Railway URL. Vercel preview build is static-only; Colyseus remains on Railway.
 - `playwright.remote.config.ts`, `tests/remote/staging-live.spec.ts`, and `.github/workflows/staging-smoke.yml` run HTTPS API + real two-browser WebSocket smoke separately from local CI; **do not claim WAN success unless this workflow passes**. This check uses GitHub CI (one cloud runner) rather than two separate home/mobile networks.
 - Both platforms may accrue hosting usage. Keep the staging environment restricted to invited testers; no accounts, user analytics, persistent rooms or full D2 scene yet.
+
+## Verified live staging — 2026-11-05
+
+**Frontend:** [Open preview](https://dat-lat-hen-nhau-preview-git-ops-stagi-636dc7-hungtvbs-projects.vercel.app/), Vercel deployment from `f82771b` READY. **Backend:** `https://dalat-colyseus-staging.up.railway.app`, Railway service `dalat-colyseus` SUCCESS, single replica.
+
+**External smoke:** [GitHub Actions run 42048418805, attempt 2](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42048418805/attempts/2) — **3/3 Playwright PASS (9.4s)**: HTTPS healthcheck, origin denial, two independent Chromium contexts through Vercel and Railway, invitation creation/join, 2/6 roster, server WebSocket state-patch traffic during movement. This proves browser multiplayer via public endpoints **from one remote cloud runner**, not actual two devices on different ISPs.
+
+**Root cause fixed from first remote test:** Railway domain initially routed port `2567` while runtime listened on `8080`, producing HTTP 502. Domain target corrected to `8080`; Railway edge logs confirm `GET /health` 200, blocked `POST /api/rooms` 403, allowed create 201 and two matchmaker joins 200.
+
+**Limitations:** This private-group test preview still renders symbolic lake/avatars. Railway GitHub OAuth access to this repository is missing; backend uses official Node image with a **pinned, CI-verified source checkout at runtime** (staging-only and slower restarts). Reconnect Railway GitHub App for reliable source builds before public release. Paid/free hosting quota usage may accrue. Neither real GPU quality nor two physical-user WAN reliability is accepted.
