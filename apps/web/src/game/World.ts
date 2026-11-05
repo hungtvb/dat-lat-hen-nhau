@@ -80,7 +80,23 @@ export class World {
     a.group.rotation.y=-player.heading;
     a.group.visible=player.connected;
   }
-  remove(id:string) {const a=this.avatars.get(id);if(!a)return;this.scene.remove(a.group);a.group.traverse(obj=>{if(obj instanceof THREE.Mesh){obj.geometry.dispose();} });a.cloth.dispose();(a.label.material as THREE.SpriteMaterial).map?.dispose();(a.label.material as THREE.SpriteMaterial).dispose();this.avatars.delete(id);}
+  remove(id:string) {
+    const a=this.avatars.get(id);if(!a)return;
+    this.scene.remove(a.group);
+    const materials=new Set<THREE.Material>();
+    a.group.traverse(obj=>{
+      if(obj instanceof THREE.Mesh){
+        obj.geometry.dispose();
+        const owned=Array.isArray(obj.material)?obj.material:[obj.material];
+        owned.forEach(material=>materials.add(material));
+      }
+    });
+    materials.forEach(material=>material.dispose());
+    const labelMaterial=a.label.material as THREE.SpriteMaterial;
+    labelMaterial.map?.dispose();
+    labelMaterial.dispose();
+    this.avatars.delete(id);
+  }
   getInput(){let f=0,s=0;if(this.keys.has('w')||this.keys.has('arrowup'))f+=1;if(this.keys.has('s')||this.keys.has('arrowdown'))f-=1;if(this.keys.has('a')||this.keys.has('arrowleft'))s-=1;if(this.keys.has('d')||this.keys.has('arrowright'))s+=1;return {forward:f,strafe:s,heading:this.yaw};}
   private activeInInput(){const e=document.activeElement;return e instanceof HTMLInputElement||e instanceof HTMLTextAreaElement||e instanceof HTMLButtonElement||e instanceof HTMLSelectElement;}
   private onKeyDown=(e:KeyboardEvent)=>{if(this.activeInInput())return;const k=e.key.toLowerCase();if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(k)){e.preventDefault();this.keys.add(k);}};

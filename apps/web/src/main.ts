@@ -40,6 +40,31 @@ if(currentInvite){
 function report(message:string){error.hidden=false;error.textContent=message;}
 function setPending(value:boolean){pending=value;joinButton.disabled=value;joinButton.textContent=value?'Đang chuẩn bị chỗ hẹn…':currentInvite?'Vào gặp mọi người ↗':'Tạo chỗ hẹn ↗';}
 
+/** One teardown path for both an intentional exit and an unexpected terminal room leave.
+ * Remove the active room reference FIRST so callbacks from an older session cannot
+ * tear down a newly joined session. Temporary SDK onDrop is not terminal.
+ */
+function resetSession(message?:string) {
+  room=null;
+  stopInput();stopInput=()=>{};
+  detachPlayers();detachPlayers=()=>{};
+  players.clear();
+  scene?.dispose();scene=null;
+  worldScreen.hidden=true;lobby.hidden=false;
+  document.querySelector<HTMLElement>('#webgl-error')!.hidden=true;
+  roomStatus.textContent='Đang kết nối…';
+  roster.replaceChildren();
+  status.textContent='';
+  history.replaceState(null,'',location.pathname+location.search);
+  currentInvite=null;
+  document.querySelector('#join-title')!.textContent='Cùng đi dạo thôi.';
+  joinDesc.textContent='Chọn một tên gọi, một màu áo khoác. Bạn có thể tạo phòng mới hoặc mở link bạn bè gửi.';
+  inviteNote.textContent='Nếu có link mời, mở link đó để vào cùng phòng bạn.';
+  setPending(false);
+  error.hidden=true;
+  if(message)report(message);
+}
+
 form.addEventListener('submit',async event=>{
   event.preventDefault();if(pending)return;
   error.hidden=true;
@@ -47,23 +72,31 @@ form.addEventListener('submit',async event=>{
   const variant=parseVariant((form.querySelector<HTMLInputElement>('input[name=variant]:checked')?.value));
   if(!name||!variant){report('Kiểm tra tên và màu áo trước khi vào nhé.');return;}
   setPending(true);
+  let connected:Room|null=null;
   try{
     const invite=currentInvite??await createRoom();
     currentInvite=invite;
     history.replaceState(null,'',inviteUrl(invite));
-    const connected=await joinRoom(invite,{name,variant});
+    connected=await joinRoom(invite,{name,variant});
     room=connected;
     await openRoom(connected);
-  }catch(e){report(e instanceof Error?e.message:'Không kết nối được đến máy chủ.');setPending(false);}
+  }catch(e){
+    // A failed render setup must not leave a ghost session on the server.
+    if(connected){
+      resetSession();
+      try{await connected.leave();}catch{ /* already disconnected */ }
+    }
+    report(e instanceof Error?e.message:'Không kết nối được đến máy chủ.');
+    setPending(false);
+  }
 });
 
 async function openRoom(connected:Room){
   lobby.hidden=true;worldScreen.hidden=false;
-  try{scene=new World(document.querySelector<HTMLElement>('#viewport')!);}catch(e){
-    document.querySelector<HTMLElement>('#webgl-error')!.hidden=false;
-    roomStatus.textContent='Không thể khởi tạo WebGL trên thiết bị này.';
+  try{scene=new World(document.querySelector<HTMLElement>('#viewport')!);}catch{
+    throw new Error('Không thể khởi tạo WebGL trên thiết bị này. Hãy thử Chrome hoặc Edge có bật WebGL2.');
   }
-  scene?.setSelf(connected.sessionId);
+  scene.setSelf(connected.sessionId);
   const renderRoster=()=>{
     roster.replaceChildren();
     const frag=document.createDocumentFragment();
@@ -77,11 +110,11 @@ async function openRoom(connected:Room){
     roster.appendChild(frag);roomStatus.textContent=`${players.size}/6 người đang cùng phòng`;
   };
   detachPlayers=listenPlayers(connected,(id,p)=>{players.set(id,p);scene?.upsert(id,p);renderRoster();},(id,p)=>{players.set(id,p);scene?.upsert(id,p);renderRoster();},id=>{players.delete(id);scene?.remove(id);renderRoster();});
-  connected.onDrop(()=>roomStatus.textContent='Đang nối lại kết nối…');
-  connected.onReconnect(()=>roomStatus.textContent='Đã trở lại bên mọi người.');
+  connected.onDrop(()=>{if(room===connected)roomStatus.textContent='Đang nối lại kết nối…';});
+  connected.onReconnect(()=>{if(room===connected)roomStatus.textContent='Đã trở lại bên mọi người.';});
   connected.onLeave(()=>{
-    roomStatus.textContent='Kết nối đã kết thúc.';
-    stopInput();
+    if(room!==connected)return;
+    resetSession('Kết nối phòng đã kết thúc. Anh có thể tạo phòng mới hoặc mở lại link mời để tham gia.');
   });
   let seq=0;
   const timer=window.setInterval(()=>{
@@ -97,11 +130,8 @@ copy.addEventListener('click',async()=>{
   catch{status.textContent='Trình duyệt chặn clipboard. Hãy sao chép link trên thanh địa chỉ.';}
 });
 leave.addEventListener('click',async()=>{
-  stopInput();detachPlayers();players.clear();scene?.dispose();scene=null;
-  if(room){try{await room.leave();}catch{}room=null;}
-  worldScreen.hidden=true;lobby.hidden=false;history.replaceState(null,'',location.pathname);currentInvite=null;
-  document.querySelector('#join-title')!.textContent='Cùng đi dạo thôi.';
-  joinDesc.textContent='Chọn một tên gọi, một màu áo khoác. Bạn có thể tạo phòng mới hoặc mở link bạn bè gửi.';
-  inviteNote.textContent='Nếu có link mời, mở link đó để vào cùng phòng bạn.';
-  setPending(false);
+  const leaving=room;
+  if(!leaving)return;
+  resetSession();
+  try{await leaving.leave();}catch{ /* UI is already returned to lobby */ }
 });

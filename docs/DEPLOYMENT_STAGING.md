@@ -46,3 +46,10 @@ This deployment intentionally serves the **placeholder** lake/avatars, not the a
 **Root cause fixed from first remote test:** Railway domain initially routed port `2567` while runtime listened on `8080`, producing HTTP 502. Domain target corrected to `8080`; Railway edge logs confirm `GET /health` 200, blocked `POST /api/rooms` 403, allowed create 201 and two matchmaker joins 200.
 
 **Limitations:** This private-group test preview still renders symbolic lake/avatars. Railway GitHub OAuth access to this repository is missing; backend uses official Node image with a **pinned, CI-verified source checkout at runtime** (staging-only and slower restarts). Reconnect Railway GitHub App for reliable source builds before public release. Paid/free hosting quota usage may accrue. Neither real GPU quality nor two physical-user WAN reliability is accepted.
+
+## PR #4 isolated desktop stability staging
+
+- **New verified test URL:** https://dat-lat-hen-nhau-preview-git-fix-deskt-3b72a2-hungtvbs-projects.vercel.app/ (PR4 client source `2d27925` unchanged by subsequent test/docs commits). Vercel reports READY.
+- Railway backend service remains at pinned original source `a090f46`; `ALLOWED_ORIGINS` additionally authorizes **only this exact new preview origin**. It redeployed after the environment change, showing SUCCESS. Existing PR3 preview link was **not overwritten**.
+- Evidence: [local 13/13](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42069923384); [remote 5/5](https://github.com/hungtvb/dat-lat-hen-nhau/actions/runs/42070614219) on `fix/desktop-session-stability`. One CI cloud runner, not physical 2-network playtest. Room state remains in-memory and restarts lose sessions.
+- To make this the canonical public-preview URL later, deliberately review an alias migration with an explicit rollback. Do not infer success of alias reassignment or auto-merge from CI.

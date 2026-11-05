@@ -56,3 +56,54 @@ test('two browsers can create, join and walk together over actual HTTPS/WSS',asy
     expect(jsErrors).toEqual([]);
   } finally {await Promise.allSettled([c1.close(),c2.close()]);}
 });
+
+test('staging browser can leave and create a new session in the same tab',async ({page})=>{
+  await page.goto('/');
+  await page.locator('#nickname').fill('Khách Staging');
+  await page.locator('#join-button').click();
+  await expect(page.locator('#world')).toBeVisible({timeout:25000});
+  await expect(page.locator('#viewport canvas')).toHaveCount(1);
+  const firstRoom=page.url();
+  await page.locator('#leave').click();
+  await expect(page.locator('#lobby')).toBeVisible();
+  await expect(page.locator('#world')).toBeHidden();
+  await expect(page.locator('#viewport canvas')).toHaveCount(0);
+  await expect.poll(()=>new URL(page.url()).hash).toBe('');
+  await page.locator('#join-button').click();
+  await expect(page.locator('#world')).toBeVisible({timeout:25000});
+  await expect(page.locator('#viewport canvas')).toHaveCount(1);
+  expect(page.url()).not.toBe(firstRoom);
+});
+
+test('staging terminal WebSocket closes cleanly and returns to lobby',async ({browser})=>{
+  const ctx=await browser.newContext();
+  await ctx.addInitScript(()=>{
+    const NativeSocket=window.WebSocket;
+    const sockets:WebSocket[]=[];
+    (window as any).__DALAT_SMOKE_SOCKETS__=sockets;
+    window.WebSocket=class extends NativeSocket{
+      constructor(url:string|URL,protocols?:string|string[]){
+        super(url,protocols);sockets.push(this);
+      }
+    } as typeof WebSocket;
+  });
+  try{
+    const page=await ctx.newPage();
+    const webOrigin=process.env.STAGING_WEB_ORIGIN!;
+    await page.goto(webOrigin);
+    await page.locator('#nickname').fill('Khách Mất Mạng');
+    await page.locator('#join-button').click();
+    await expect(page.locator('#world')).toBeVisible({timeout:25000});
+    await page.evaluate(()=>{
+      const sockets=(window as any).__DALAT_SMOKE_SOCKETS__ as WebSocket[];
+      const active=sockets.findLast(s=>s.readyState===WebSocket.OPEN);
+      if(!active)throw new Error('No open room WebSocket');
+      active.close(1000,'Terminated by remote browser smoke');
+    });
+    await expect(page.locator('#lobby')).toBeVisible({timeout:25000});
+    await expect(page.locator('#join-error')).toContainText('Kết nối phòng đã kết thúc');
+    await expect(page.locator('#viewport canvas')).toHaveCount(0);
+    await expect(page.locator('#join-button')).toBeEnabled();
+    await expect.poll(()=>new URL(page.url()).hash).toBe('');
+  }finally{await ctx.close();}
+});
