@@ -46,3 +46,33 @@ jobs:
             playwright-report/
           if-no-files-found: ignore
           retention-days: 7
+
+  # One-time bootstrap job. Only trusted same-repository foundation PR can write.
+  # Remove this job immediately after package-lock.json has been committed.
+  pin_lockfile:
+    needs: validate
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'feat/multiplayer-foundation' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: reviewed-npm-lockfile
+      - name: Commit tested lockfile to PR branch
+        shell: bash
+        run: |
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
+          test -s package-lock.json
+          if git ls-files --error-unmatch package-lock.json >/dev/null 2>&1; then
+            echo "Lockfile is already tracked; nothing to commit."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package-lock.json
+          git commit -m 'chore: pin verified npm dependencies'
+          git push origin HEAD:refs/heads/feat/multiplayer-foundation
