@@ -14,10 +14,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      # Bootstrap stage: use npm install to produce a reviewed lockfile artifact.
-      # Once package-lock.json is committed, replace this with npm ci.
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
       - name: Contract tests
         run: npm test
       - name: App type checks
@@ -28,14 +27,6 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Multiplayer tests (two isolated browser contexts)
         run: npm run test:e2e
-      - name: Upload dependency lockfile for review
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: reviewed-npm-lockfile
-          path: package-lock.json
-          if-no-files-found: error
-          retention-days: 7
       - name: Upload Playwright diagnostics
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
@@ -46,33 +37,3 @@ jobs:
             playwright-report/
           if-no-files-found: ignore
           retention-days: 7
-
-  # One-time bootstrap job. Only trusted same-repository foundation PR can write.
-  # Remove this job immediately after package-lock.json has been committed.
-  pin_lockfile:
-    needs: validate
-    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'feat/multiplayer-foundation' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-      - uses: actions/download-artifact@v4
-        with:
-          name: reviewed-npm-lockfile
-      - name: Commit tested lockfile to PR branch
-        shell: bash
-        run: |
-          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha }}"
-          test -s package-lock.json
-          if git ls-files --error-unmatch package-lock.json >/dev/null 2>&1; then
-            echo "Lockfile is already tracked; nothing to commit."
-            exit 0
-          fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add package-lock.json
-          git commit -m 'chore: pin verified npm dependencies'
-          git push origin HEAD:refs/heads/feat/multiplayer-foundation
