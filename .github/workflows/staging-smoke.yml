@@ -1,0 +1,24 @@
+name: Live staging HTTPS/WSS smoke
+on:
+  push:
+    branches: [ops/staging-deploy]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  remote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      STAGING_WEB_ORIGIN: https://dat-lat-hen-nhau-preview-git-ops-stagi-636dc7-hungtvbs-projects.vercel.app
+      STAGING_API_ORIGIN: https://dalat-colyseus-staging.up.railway.app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: External browser and API checks
+        run: npx playwright test -c playwright.remote.config.ts
