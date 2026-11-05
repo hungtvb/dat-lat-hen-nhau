@@ -5,7 +5,7 @@
 | Work item | Current evidence | Status |
 |---|---|---|
 | T01 monorepo, typed shared contracts | `package.json` workspaces; `packages/shared` compiled with global TypeScript compiler; 6 domain test groups passed | **PARTIAL VERIFIED** |
-| T01 CI workflow | `.github/workflows/ci.yml` committed on feature branch; CI outcome and lockfile still pending | **CODED / NOT RUN** |
+| T01 CI workflow | GitHub Actions run `41987904294` on `52f49fd`: dependency install, 6 contract tests, TypeScript typecheck, and client/server build all passed; lockfile still missing | **CI VERIFIED / LOCKFILE PENDING** |
 | T02 private room + invite gate | `apps/server/src/main.ts`, `LakesideRoom.ts`, token digest and validation | **CODED / NOT RUN** |
 | T03 server-authoritative movement | `moveInput` validation; 20Hz simulation loop, 2.2m/s clamp and replay sequence guard | **CODED / NOT RUN** |
 | T03 client presence / avatar | `apps/web/src/network` + `apps/web/src/game/World.ts` | **CODED / NOT RUN** |
@@ -25,7 +25,7 @@ Node.js `v22.16.0`, TypeScript globally installed, Python 3.13.5, Chromium avail
 
 ## Blocking conditions and next gate
 
-Network DNS resolution `registry.npmjs.org` failed with `EAI_AGAIN`, so `npm install` was not possible. Server/Three.js Vite runtime, app typecheck and two-browser multiplayer scenarios have **not run**. Static screenshot cannot certify functionality. To proceed, install dependencies on a networked machine; run `npm test`, `npm run typecheck`, `npm run build`, and `npm run test:e2e`; fix any issues, then attach Playwright trace / server logs. Generate and commit `package-lock.json`, change CI `npm install` → `npm ci`, then close T01. Do not begin art proof until at least two independent clients have a verified shared room and movement.
+Local network DNS failed with `EAI_AGAIN`, so dependencies could not be installed locally. **GitHub CI verified** `npm install`, `npm test`, `npm run typecheck` and `npm run build` on `52f49fd` (workflow run `41987904294`, success). **Still NOT RUN:** actual Colyseus join/reconnect, GPU WebGL rendering, and Playwright two-browser multiplayer scenarios. Static screenshot and successful build do not certify multiplayer functionality. Next: execute `npm run test:e2e` against real server and two isolated browser contexts; capture trace/server logs, fix failures, then generate and commit `package-lock.json` and switch CI `npm install` → `npm ci`. Keep PR Draft until those acceptance gates pass; do not begin polished art proof before verified shared room and movement.
 
 ## Security caveats
 
