@@ -29,3 +29,10 @@ Disable access to the preview (or remove staging domain), then redeploy previous
 ## Remaining blockers for public release
 
 This deployment intentionally serves the **placeholder** lake/avatars, not the approved D2 art proof. Abuse throttling at proxy level, real-device GPU/FPS, mobile/UX, and multi-device WAN playtest need evidence before a public launch.
+
+## Live staging records (2026-11-05)
+
+- Railway project `dat-lat-hen-nhau-staging`, environment `staging`, Colyseus URL: `https://dalat-colyseus-staging.up.railway.app`. Initial Git integration incorrectly used `main` then failed to reconnect `ops/staging-deploy`: Railway's OAuth account lacks GitHub repository authorization. **Temporary fallback:** official public `node:22` container pulls the *public repository*, checks out and verifies CI-green commit `a090f4668d80ed9f79cba6cf590de047495f49bb`, installs/builds then launches `@dalat/server`. This is staging-only; restart takes much longer and network access to GitHub/npm is required. Replace with GitHub-sourced builds (grant Railway GitHub repo authorization) before maintainable CI/CD.
+- Vercel project `dat-lat-hen-nhau-preview`, branch alias `https://dat-lat-hen-nhau-preview-git-ops-stagi-636dc7-hungtvbs-projects.vercel.app`; public build-time `VITE_API_ORIGIN` points at Railway URL. Vercel preview build is static-only; Colyseus remains on Railway.
+- `playwright.remote.config.ts`, `tests/remote/staging-live.spec.ts`, and `.github/workflows/staging-smoke.yml` run HTTPS API + real two-browser WebSocket smoke separately from local CI; **do not claim WAN success unless this workflow passes**. This check uses GitHub CI (one cloud runner) rather than two separate home/mobile networks.
+- Both platforms may accrue hosting usage. Keep the staging environment restricted to invited testers; no accounts, user analytics, persistent rooms or full D2 scene yet.
