@@ -57,7 +57,7 @@ export class World {
     light.position.set(-17,24,9);this.scene.add(light);
     buildLakesideGreybox(this.scene);
     this.renderer.domElement.dataset.scene='D2A1-SHOT01';
-    this.camera.position.set(10,8,13);this.camera.lookAt(0,1,0);
+    this.camera.position.set(7.6,3.35,7);this.camera.lookAt(0,1.3,0);
     this.resizeObserver=new ResizeObserver(()=>this.resize());this.resizeObserver.observe(container);this.resize();
     window.addEventListener('keydown',this.onKeyDown);window.addEventListener('keyup',this.onKeyUp);window.addEventListener('blur',this.clearKeys);
     this.renderer.domElement.addEventListener('pointerdown',this.onPointerDown);window.addEventListener('pointermove',this.onPointerMove);window.addEventListener('pointerup',this.onPointerUp);
@@ -102,7 +102,7 @@ export class World {
     if(this.stopped)return;
     this.avatars.forEach(a=>a.group.position.lerp(a.target,.18));
     const self=this.avatars.get(this.selfId);
-    if(self){const p=self.group.position;const offset=new THREE.Vector3(Math.sin(this.yaw)*8,5.8,Math.cos(this.yaw)*8.4);const pos=p.clone().add(offset);this.camera.position.lerp(pos,.075);this.camera.lookAt(p.x,p.y+1.3,p.z);}
+    if(self){const p=self.group.position;const offset=new THREE.Vector3(Math.sin(this.yaw)*9.6,3.35,Math.cos(this.yaw)*9.6);const pos=p.clone().add(offset);this.camera.position.lerp(pos,.075);this.camera.lookAt(p.x,p.y+1.3,p.z);}
     this.renderer.render(this.scene,this.camera);
     this.raf=requestAnimationFrame(this.update);
   };
