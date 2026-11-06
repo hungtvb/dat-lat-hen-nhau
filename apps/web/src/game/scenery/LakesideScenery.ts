@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import {createHeroPine} from "./HeroPine";
 
 /** D2-A1 original geometry — painterly Xuân Hương-inspired greybox, not GIS data.
  * Shore/water stay to the west of the server-authoritative x = -22m boundary.
@@ -40,8 +41,8 @@ export function buildLakesideGreybox(scene:THREE.Scene) {
   world.add(bank);
 
   const walkway=ribbon("D2A_40m_walkable_path",80,2,(i,j)=>{
-    const z=-20+40*i/80,center=-2.9+.55*Math.sin(z*.1);
-    return [center+(j===0?-2.95:2.95),.009,z];
+    const z=-20+40*i/80,center=-1.65+.55*Math.sin(z*.1);
+    return [center+(j===0?-1.9:1.9),.009,z];
   },new THREE.MeshStandardMaterial({color:0xbcb5a2,roughness:1,side:THREE.DoubleSide}));
   world.add(walkway);
 
@@ -69,6 +70,8 @@ export function buildLakesideGreybox(scene:THREE.Scene) {
   }
   ripples.instanceMatrix.needsUpdate=true;world.add(ripples);
 
+  // Shore-side trunk lies beyond x = -22m, preserving existing room movement.
+  world.add(createHeroPine());
   scene.add(world);
   return world;
 }
