@@ -33,14 +33,14 @@ function labelTexture(name:string):THREE.CanvasTexture {
   return new THREE.CanvasTexture(canvas);
 }
 
-/** D2-A1 terrain greybox awaiting real-engine art review. */
+/** D2-A2 scenic proof: terrain and hero pine; art approval/GPU QA still pending. */
 export class World {
   readonly renderer:THREE.WebGLRenderer;
   private readonly scene = new THREE.Scene();
   private readonly camera = new THREE.PerspectiveCamera(56,1,.1,210);
   private readonly avatars=new Map<string,AvatarVisual>();
   private readonly keys=new Set<string>();
-  private selfId='';private stopped=false;private raf=0;private yaw=.9;
+  private selfId='';private stopped=false;private raf=0;private yaw=1.25;
   private width=1;private height=1;
   private dragFromX: number|null=null;
   private resizeObserver:ResizeObserver;
@@ -56,7 +56,8 @@ export class World {
     const light=new THREE.DirectionalLight(0xffddb3,1.9);
     light.position.set(-17,24,9);this.scene.add(light);
     buildLakesideGreybox(this.scene);
-    this.renderer.domElement.dataset.scene='D2A1-SHOT01';
+    this.renderer.domElement.dataset.scene='D2A2-SHOT01';
+    this.renderer.domElement.dataset.landmark='hero-pine';
     this.camera.position.set(7.6,3.35,7);this.camera.lookAt(0,1.3,0);
     this.resizeObserver=new ResizeObserver(()=>this.resize());this.resizeObserver.observe(container);this.resize();
     window.addEventListener('keydown',this.onKeyDown);window.addEventListener('keyup',this.onKeyUp);window.addEventListener('blur',this.clearKeys);
