@@ -40,6 +40,14 @@ export function createDaLatMale() {
   const capColor=new THREE.Color('#8d5f4c');
   const oldCap=head.children.filter(x=>x.isMesh&&x.material.color&&x.material.color.equals(capColor));
   oldCap.forEach(x=>head.remove(x));
+  // The kit's chamfered-square face is too puppet-like for this art direction.
+  // Keep its neck/head joint, eyes and nose, but use an organic rounded face shell.
+  const faceBlock=head.children.find(x=>x.isMesh&&x.geometry.type==='ExtrudeGeometry' &&
+    x.material.color?.equals(new THREE.Color('#d9a97f')));
+  if(faceBlock)head.remove(faceBlock);
+  blob(head,'rounded-face',skin,[0,.105,-.003],[.098,.126,.104],18);
+  head.children.filter(x=>x.isMesh&&x.geometry.type==='SphereGeometry'&&
+    x.material.color?.equals(new THREE.Color('#221c18'))).forEach(x=>x.scale.multiplyScalar(.74));
   // Under-cut + swept fringe. Details intentionally larger than real scale
   // so the hairstyle is legible behind a third-person follow camera.
   blob(head,'hair-crown',hair,[0,.232,-.012],[.112,.055,.106],14);
