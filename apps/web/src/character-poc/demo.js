@@ -38,6 +38,25 @@ function setPose(mode){
     Object.assign(walker.state,{moving:false,route:null,phase:.04,speed:0,
       position:[0,0,0],heading:0});
     walker.animate(1/60,0);
+    // Neutral planted-foot pose for the inspection viewer. The upstream walker
+    // defaults to MID-STRIDE, which is correct for its gait proof but not "Đứng".
+    // Walking continues to use the untouched 3Dviz pose() + analytic IK.
+    const hips=walker.group.children[0].children[0].children[0];
+    hips.position.y=.90;hips.rotation.y=0;
+    hips.children.filter(x=>x.type==='Group' && x!==hips.children[0]).forEach(hip=>{
+      hip.rotation.x=0;
+      const knee=hip.children.find(x=>x.type==='Group');
+      if(knee){knee.rotation.x=0;
+        const foot=knee.children.find(x=>x.name.startsWith('foot-'));
+        if(foot)foot.rotation.x=0;
+      }
+    });
+    const torso=hips.children[0];torso.rotation.x=0;
+    torso.children.filter(x=>x.type==='Group'&&Math.abs(x.position.x)>.1).forEach(shoulder=>{
+      shoulder.rotation.x=-.09;shoulder.rotation.z=Math.sign(shoulder.position.x)*.09;
+      const elbow=shoulder.children.find(x=>x.type==='Group');
+      if(elbow)elbow.rotation.x=-.22;
+    });
   } else {
     walker.setRoute([[0,-.7],[0,.7]],true);
     walker.state.speed=.65;
