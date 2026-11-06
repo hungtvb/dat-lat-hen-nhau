@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Đà Lạt Hẹn Nhau — Nam 02 / 3Dviz Proof</title>
+<style>
+:root{font-family:Inter,ui-sans-serif,system-ui,sans-serif;background:#182923;color:#f3eddf}
+*{box-sizing:border-box}body{margin:0;overflow:hidden}#scene{width:100vw;height:100vh;display:block;cursor:grab;touch-action:none}#scene:active{cursor:grabbing}
+.brand{position:fixed;left:34px;top:30px;pointer-events:none}.eyebrow{font-size:11px;letter-spacing:.22em;color:#e2c49b;font-weight:700;text-transform:uppercase}.brand h1{font:400 36px/1.05 Georgia,serif;margin:15px 0 11px;color:#f6f0e1}.brand p{font-size:13px;color:#afc3ae;line-height:1.7;max-width:260px}
+.chip{display:inline-block;border:1px solid #d4dfbf55;border-radius:24px;padding:8px 14px;background:#17292199;font-size:11px;color:#c8ddc4}
+.meta{position:fixed;right:32px;top:34px;text-align:right;max-width:245px;pointer-events:none}.meta h2{font:400 24px/1.2 Georgia,serif;margin:4px 0 11px}.meta p{font-size:12px;line-height:1.65;color:#a3bba9}
+.controls{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);border:1px solid #e8e1ca44;background:#1e332de8;backdrop-filter:blur(12px);padding:8px;border-radius:12px;display:flex;gap:4px;box-shadow:0 20px 70px #0005;max-width:calc(100vw - 20px);overflow:auto}
+button{background:none;border:0;color:#d3ded0;font:600 12px system-ui;cursor:pointer;border-radius:7px;padding:11px 14px;white-space:nowrap}button:hover,button.active{background:#e9e1ca;color:#273a33}button:focus-visible{outline:2px solid #e4bf85;outline-offset:2px}
+#status{position:fixed;bottom:94px;left:0;right:0;text-align:center;font-size:12px;color:#d4ddc5;pointer-events:none}
+@media(max-width:640px){.brand{left:18px;top:20px}.brand h1{font-size:25px}.brand p{display:none}.meta{right:16px;top:20px}.meta h2{font-size:16px}.meta p{display:none}.controls{bottom:15px}button{padding:10px 11px;font-size:11px}}
+</style></head><body>
+<canvas id="scene" aria-label="Model nam 3D có thể xoay 360 độ và xem chuyển động"></canvas>
+<div class="brand"><div class="eyebrow">Character Proof 02 · 3Dviz Pro Max</div><h1>Đà Lạt Hẹn Nhau</h1>
+<p>Một nhân vật nam stylized, sẵn sàng cho bước thử chuyển động trên web.</p><span class="chip">Biped-walker blueprint · MIT</span></div>
+<div class="meta"><h2>Người bạn đồng hành</h2><p>Áo khoác đất nung · khăn xanh thông<br>Ba lô nhỏ · Walk IK procedural</p></div>
+<div id="status" role="status">Kéo để xoay · Cuộn để zoom · Đổi góc nhìn bên dưới</div>
+<div class="controls">
+<button id="idle" class="active">Đứng</button><button id="walk">Đi bộ</button>
+<button id="front" class="active">Trước</button><button id="side">Nghiêng</button><button id="back">Sau</button>
+<button id="export">Xuất GLB</button></div>
+<script type="module" src="/src/character-poc/demo.js"></script></body></html>
